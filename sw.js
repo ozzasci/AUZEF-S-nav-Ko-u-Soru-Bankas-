@@ -1,4 +1,4 @@
-const CACHE_NAME = 'auzef-sınav-v2.0';
+const CACHE_NAME = 'auzef-sınav-v3.0';
 const assetsToCache = [
   './index.html',
   './manifest.json'
