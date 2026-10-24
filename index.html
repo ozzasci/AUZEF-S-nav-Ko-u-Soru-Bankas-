@@ -106,6 +106,9 @@
           <button onclick="shareQuestionOnWhatsApp()" class="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 transition">
   <span>📤 Soru Paylaş</span>
 </button>
+          <button onclick="startBlitzMode()" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-orange-600 text-white hover:bg-orange-500 shadow-sm flex items-center gap-1.5" title="Süreye Karşı Hızlı Yarış Modu">
+  <span>⚡ Blitz Modu</span>
+</button>
         </div>
       </div>
     </div>
@@ -551,6 +554,58 @@ function copyJsonToClipboard() {
     document.getElementById("copyStatus").innerText = "✓ Kopyalandı!";
   });
 }
+  let isBlitzMode = false;
+let blitzTimerInterval = null;
+let blitzSecondsLeft = 30;
+
+function startBlitzMode() {
+  const course = courses[activeCourseKey];
+  if (!course || !Array.isArray(course.sorular) || course.sorular.length === 0) {
+    alert("Bu derste çözülecek soru bulunamadı.");
+    return;
+  }
+
+  const shuffled = [...course.sorular].sort(() => Math.random() - 0.5);
+  activePool = shuffled.slice(0, Math.min(15, shuffled.length)); // Blitz modunda hızlıca 15 soru
+  
+  activePool.forEach(q => { delete sessionAnswers[q.id]; });
+  saveSessionState();
+
+  isBlitzMode = true;
+  isExamMode = false;
+  if (examTimerInterval) clearInterval(examTimerInterval);
+
+  currentIndex = 0;
+  renderAll();
+  startBlitzQuestionTimer();
+}
+
+function startBlitzQuestionTimer() {
+  if (blitzTimerInterval) clearInterval(blitzTimerInterval);
+  blitzSecondsLeft = 30; // Her soru için 30 saniye
+  
+  const timerBadge = document.getElementById("reminderTimerBadge");
+  if (timerBadge) timerBadge.classList.remove("hidden");
+
+  blitzTimerInterval = setInterval(() => {
+    blitzSecondsLeft--;
+    if (timerBadge) timerBadge.innerText = `⚡ 00:${String(blitzSecondsLeft).padStart(2, "0")}`;
+
+    if (blitzSecondsLeft <= 0) {
+      clearInterval(blitzTimerInterval);
+      // Süre bitti, boş geç ve sonraki soruya geç
+      if (currentIndex < activePool.length - 1) {
+        currentIndex++;
+        renderAll();
+        startBlitzQuestionTimer();
+      } else {
+        finishBlitzMode();
+      }
+    }
+  }, 1000);
+}
+
+// Soru değiştikçe Blitz süresini sıfırlamak için navigateQuestion fonksiyonuna müdahale edebiliriz veya manuel geçişte tetikleyebiliriz.
 
 function downloadJsonFile() {
   const text = document.getElementById("editableJsonOutput").value;
@@ -796,7 +851,16 @@ function navigateQuestion(step) {
   if (target >= 0 && target < activePool.length) {
     currentIndex = target;
     renderAll();
+    if (isBlitzMode) startBlitzQuestionTimer();
   }
+}
+
+function finishBlitzMode() {
+  if (blitzTimerInterval) clearInterval(blitzTimerInterval);
+  isBlitzMode = false;
+  document.getElementById("reminderTimerBadge")?.classList.add("hidden");
+  alert("⚡ Blitz Modu tamamlandı! Harika bir hız pratiği yaptın.");
+  finishCurrentTestAnytime();
 }
 
 function jumpToQuestion(idx) {
