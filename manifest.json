@@ -4,6 +4,7 @@
   "description": "AUZEF öğrencileri için ünite ve vize soruları içeren, çevrimdışı çalışabilen ve akıllı koçluk bildirimleri sunan interaktif sınav platformu.",
   "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
   "icons": [
