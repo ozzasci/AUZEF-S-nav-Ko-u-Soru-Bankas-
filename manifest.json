@@ -7,6 +7,7 @@
   "scope": "./",
   "display": "standalone",
   "display_override": [
+    "tabbed",
     "window-controls-overlay",
     "standalone",
     "minimal-ui"
@@ -21,6 +22,9 @@
     "books",
     "productivity"
   ],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
   "prefer_related_applications": false,
   "related_applications": [],
   "iarc_rating_id": "IARC-Z100",
