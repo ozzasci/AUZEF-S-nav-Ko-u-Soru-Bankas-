@@ -648,44 +648,119 @@ function startMatchingGameModal() {
     return;
   }
 
-  // Soru havuzundan rastgele 4-5 soru seçip kavram ve soru metnini eşleştirme havuzu yapalım
-  const shuffled = [...course.sorular].sort(() => Math.random() - 0.5).slice(0, 5);
+let matchingGamePool = [];
+let selectedTermCard = null;
+let matchedPairsCount = 0;
+
+function startMatchingGameModal() {
+  const course = courses[activeCourseKey];
+  if (!course || !Array.isArray(course.sorular) || course.sorular.length < 4) {
+    alert("Bu mod için derste en az 4 soru bulunmalıdır.");
+    return;
+  }
+
+  // Rastgele 4 soru seçelim
+  const shuffled = [...course.sorular].sort(() => Math.random() - 0.5).slice(0, 4);
   
-  matchingGameData = shuffled.map((q, idx) => ({
+  matchingGamePool = shuffled.map((q, idx) => ({
     id: idx,
-    term: `Soru #${q.no || idx+1} Kavramı`,
-    definition: q.soru.length > 80 ? q.soru.slice(0, 77) + "..." : q.soru,
-    originalQ: q
+    questionText: q.soru,
+    correctAnswerKey: q.cevap,
+    correctAnswerText: q.siklar[q.cevap]
   }));
 
-  // Eşleştirme modalını açıp bulmacayı ekrana çizeceğiz
-  openMatchingModalHtml();
-}
+  selectedTermCard = null;
+  matchedPairsCount = 0;
+  renderMatchingGameUI();
 
-function openMatchingModalHtml() {
-  // Modal arayüzünü dinamik oluşturabilir veya HTML'e önceden ekleyebiliriz.
-  let html = `<div class="space-y-3 text-xs">
-    <p class="font-bold text-slate-700">Aşağıdaki soruları anahtar kelimeleriyle eşleştirin:</p>`;
-  
-  matchingGameData.forEach((item, idx) => {
-    html += `<div class="p-3 bg-slate-50 border rounded-xl flex justify-between items-center gap-2">
-      <span class="font-bold text-blue-900">${item.term}</span>
-      <span class="text-slate-600">${item.definition}</span>
-    </div>`;
-  });
-  html += `</div>`;
-
-  // Mevcut popup modalını bu amaçla kullanabilir veya yeni bir modal açabiliriz.
-  document.getElementById("popupModalHeaderTitle").innerText = "🧩 Kavram Eşleştirme Bulmacası";
-  document.getElementById("popupCourseTitle").innerText = courses[activeCourseKey].ders_adi;
-  document.getElementById("popupSectionBadge").innerText = "Mini Oyun";
-  document.getElementById("popupQuestionText").innerHTML = html;
-  document.getElementById("popupOptionsList").innerHTML = `<div class="text-center font-bold text-emerald-700 py-2">Eşleştirme testi yakında tam interaktif sürümle aktif!</div>`;
-  document.getElementById("popupFeedbackBox").classList.add("hidden");
-  document.getElementById("popupNextBtn").classList.add("hidden");
-  
   document.getElementById("popupQuestionModal").classList.remove("hidden");
   document.getElementById("popupQuestionModal").classList.add("flex");
+}
+
+function renderMatchingGameUI() {
+  document.getElementById("popupModalHeaderTitle").innerText = "🧩 Kavram & Soru Eşleştirme Bulmacası";
+  document.getElementById("popupCourseTitle").innerText = courses[activeCourseKey].ders_adi;
+  document.getElementById("popupSectionBadge").innerText = `Eşleşen: ${matchedPairsCount} / 4`;
+  document.getElementById("finish10QuizEarlyBtn")?.classList.add("hidden");
+  document.getElementById("popupNextBtn").classList.add("hidden");
+  document.getElementById("popupFeedbackBox").classList.add("hidden");
+
+  if (matchedPairsCount === 4) {
+    document.getElementById("popupQuestionText").innerHTML = `
+      <div class="text-center py-6 space-y-3">
+        <div class="text-3xl">🏆</div>
+        <h4 class="font-extrabold text-emerald-800 text-base">Tebrikler Bulmacayı Tamamladın!</h4>
+        <p class="text-xs text-slate-600">Tüm kavramları başarıyla eşleştirdin. Beyin jimnastiği tamamlandı!</p>
+      </div>
+    `;
+    document.getElementById("popupOptionsList").innerHTML = `
+      <button onclick="startMatchingGameModal()" class="w-full py-2.5 rounded-xl bg-teal-700 text-white font-bold text-xs">🔄 Tekrar Oyna</button>
+    `;
+    return;
+  }
+
+  document.getElementById("popupQuestionText.innerHTML") = "";
+  document.getElementById("popupQuestionText").innerText = "Soldan soru metnine tıklayın, sağdan doğru cevap kavramını seçerek eşleştirin:";
+
+  // Soruları sol tarafa, cevapları sağ tarafa karıştırarak dizelim
+  const leftItems = [...matchingGamePool].filter(item => !item.matched).sort(() => Math.random() - 0.5);
+  const rightItems = [...matchingGamePool].filter(item => !item.matched).sort(() => Math.random() - 0.5);
+
+  let html = `
+    <div class="grid grid-cols-2 gap-3 text-xs my-2">
+      <div class="space-y-2">
+        <div class="font-bold text-slate-500 uppercase text-[10px]">Sorular</div>
+  `;
+
+  leftItems.forEach(item => {
+    const isSelected = selectedTermCard && selectedTermCard.id === item.id;
+    html += `
+      <div onclick="selectLeftMatchItem(${item.id})" class="p-3 rounded-xl border-2 cursor-pointer transition ${isSelected ? 'border-blue-600 bg-blue-50 font-bold' : 'border-slate-200 bg-white hover:border-slate-300'}">
+        ${item.questionText.length > 50 ? item.questionText.slice(0, 47) + '...' : item.questionText}
+      </div>
+    `;
+  });
+
+  html += `</div><div class="space-y-2"><div class="font-bold text-slate-500 uppercase text-[10px]">Doğru Cevaplar</div>`;
+
+  rightItems.forEach(item => {
+    html += `
+      <div onclick="selectRightMatchItem(${item.id})" class="p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-teal-500 cursor-pointer transition">
+        <strong class="text-teal-800">${item.correctAnswerKey})</strong> ${item.correctAnswerText.length > 40 ? item.correctAnswerText.slice(0, 37) + '...' : item.correctAnswerText}
+      </div>
+    `;
+  });
+
+  html += `</div></div>`;
+  document.getElementById("popupOptionsList").innerHTML = html;
+}
+
+function selectLeftMatchItem(id) {
+  selectedTermCard = matchingGamePool.find(item => item.id === id);
+  renderMatchingGameUI();
+}
+
+function selectRightMatchItem(id) {
+  if (!selectedTermCard) {
+    alert("Önce soldan bir soru seçmelisin!");
+    return;
+  }
+
+  const rightItem = matchingGamePool.find(item => item.id === id);
+
+  if (selectedTermCard.id === rightItem.id) {
+    // Doğru eşleşme!
+    selectedTermCard.matched = true;
+    matchedPairsCount++;
+    selectedTermCard = null;
+    playNotificationEffects();
+    renderMatchingGameUI();
+  } else {
+    // Yanlış eşleşme
+    alert("❌ Bu eşleşme yanlış. Tekrar dene!");
+    selectedTermCard = null;
+    renderMatchingGameUI();
+  }
 }
 
 function deleteActiveCourse() {
