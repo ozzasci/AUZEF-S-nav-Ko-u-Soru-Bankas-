@@ -103,6 +103,9 @@
           <button onclick="selectWeakCourse()" class="px-2.5 py-2 rounded-lg transition bg-rose-900 text-rose-100 hover:bg-rose-800 shadow-sm font-bold text-xs flex items-center gap-1" title="Zayıf / Yanlış Sorularım">
             <span>📌 Zayıf</span>
           </button>
+          <button onclick="shareQuestionOnWhatsApp()" class="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 transition">
+  <span>📤 Soru Paylaş</span>
+</button>
         </div>
       </div>
     </div>
@@ -485,7 +488,18 @@ function saveSessionState() {
     localStorage.setItem("auzef_session_answers_v7", JSON.stringify(sessionAnswers));
   } catch (e) {}
 }
-
+function shareQuestionOnWhatsApp() {
+  if (activePool.length === 0) return;
+  const q = activePool[currentIndex];
+  let text = `📚 *AUZEF Sınav Sorusu*\n\n*Bölüm:* ${q.bolum || 'Genel'}\n*Soru:* ${q.soru}\n\n`;
+  for (const [key, val] of Object.entries(q.siklar)) {
+    text += `${key}) ${val}\n`;
+  }
+  text += `\n*(Doğru Cevap: ${q.cevap})*\n_AUZEF Sınav Koçu ile gönderildi._`;
+  
+  const encoded = encodeURIComponent(text);
+  window.open(`https://wa.me/?text=${encoded}`, '_blank');
+}
 function saveLifetimeStats() {
   try {
     localStorage.setItem("auzef_lifetime_stats_v7", JSON.stringify(lifetimeStats));
