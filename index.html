@@ -94,7 +94,7 @@
             <option value="50">50 Soru</option>
             <option value="ALL">Tüm Sorular</option>
           </select>
-         <button onclick="startRandomExam()" class="px-2.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition shadow-sm" title="Seçilen Sayıda Test Başlat">
+          <button onclick="startRandomExam()" class="px-2.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition shadow-sm" title="Seçilen Sayıda Test Başlat">
             🎲 Test
           </button>
           <button onclick="startExamSimulation()" class="px-2.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-purple-700 text-white hover:bg-purple-600 shadow-sm flex items-center gap-1" title="Süreli Sınav Simülasyonu">
@@ -104,14 +104,14 @@
             <span>📌 Zayıf</span>
           </button>
           <button onclick="shareQuestionOnWhatsApp()" class="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 transition">
-  <span>📤 Soru Paylaş</span>
-</button>
+            <span>📤 Paylaş</span>
+          </button>
           <button onclick="startBlitzMode()" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-orange-600 text-white hover:bg-orange-500 shadow-sm flex items-center gap-1.5" title="Süreye Karşı Hızlı Yarış Modu">
-  <span>⚡ Blitz Modu</span>
-</button>
+            <span>⚡ Blitz</span>
+          </button>
           <button onclick="startMatchingGameModal()" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-teal-700 text-white hover:bg-teal-600 shadow-sm flex items-center gap-1.5" title="Kavram Eşleştirme Bulmaca Modu">
-  <span>🧩 Bulmaca</span>
-</button>
+            <span>🧩 Bulmaca</span>
+          </button>
         </div>
       </div>
     </div>
@@ -494,6 +494,7 @@ function saveSessionState() {
     localStorage.setItem("auzef_session_answers_v7", JSON.stringify(sessionAnswers));
   } catch (e) {}
 }
+
 function shareQuestionOnWhatsApp() {
   if (activePool.length === 0) return;
   const q = activePool[currentIndex];
@@ -506,6 +507,7 @@ function shareQuestionOnWhatsApp() {
   const encoded = encodeURIComponent(text);
   window.open(`https://wa.me/?text=${encoded}`, '_blank');
 }
+
 function saveLifetimeStats() {
   try {
     localStorage.setItem("auzef_lifetime_stats_v7", JSON.stringify(lifetimeStats));
@@ -557,7 +559,8 @@ function copyJsonToClipboard() {
     document.getElementById("copyStatus").innerText = "✓ Kopyalandı!";
   });
 }
-  let isBlitzMode = false;
+
+let isBlitzMode = false;
 let blitzTimerInterval = null;
 let blitzSecondsLeft = 30;
 
@@ -569,7 +572,7 @@ function startBlitzMode() {
   }
 
   const shuffled = [...course.sorular].sort(() => Math.random() - 0.5);
-  activePool = shuffled.slice(0, Math.min(15, shuffled.length)); // Blitz modunda hızlıca 15 soru
+  activePool = shuffled.slice(0, Math.min(15, shuffled.length));
   
   activePool.forEach(q => { delete sessionAnswers[q.id]; });
   saveSessionState();
@@ -585,7 +588,7 @@ function startBlitzMode() {
 
 function startBlitzQuestionTimer() {
   if (blitzTimerInterval) clearInterval(blitzTimerInterval);
-  blitzSecondsLeft = 30; // Her soru için 30 saniye
+  blitzSecondsLeft = 30;
   
   const timerBadge = document.getElementById("reminderTimerBadge");
   if (timerBadge) timerBadge.classList.remove("hidden");
@@ -596,7 +599,6 @@ function startBlitzQuestionTimer() {
 
     if (blitzSecondsLeft <= 0) {
       clearInterval(blitzTimerInterval);
-      // Süre bitti, boş geç ve sonraki soruya geç
       if (currentIndex < activePool.length - 1) {
         currentIndex++;
         renderAll();
@@ -608,7 +610,13 @@ function startBlitzQuestionTimer() {
   }, 1000);
 }
 
-// Soru değiştikçe Blitz süresini sıfırlamak için navigateQuestion fonksiyonuna müdahale edebiliriz veya manuel geçişte tetikleyebiliriz.
+function finishBlitzMode() {
+  if (blitzTimerInterval) clearInterval(blitzTimerInterval);
+  isBlitzMode = false;
+  document.getElementById("reminderTimerBadge")?.classList.add("hidden");
+  alert("⚡ Blitz Modu tamamlandı! Harika bir hız pratiği yaptın.");
+  finishCurrentTestAnytime();
+}
 
 function downloadJsonFile() {
   const text = document.getElementById("editableJsonOutput").value;
@@ -639,15 +647,8 @@ function saveJsonChanges() {
     alert("JSON Format Hatası: " + err.message);
   }
 }
-  let matchingGameData = [];
 
-function startMatchingGameModal() {
-  const course = courses[activeCourseKey];
-  if (!course || !Array.isArray(course.sorular) || course.sorular.length < 4) {
-    alert("Bu mod için derste en az 4 soru bulunmalıdır.");
-    return;
-  }
-
+// Kavram Eşleştirme Bulmaca Modu Fonksiyonları
 let matchingGamePool = [];
 let selectedTermCard = null;
 let matchedPairsCount = 0;
@@ -659,14 +660,14 @@ function startMatchingGameModal() {
     return;
   }
 
-  // Rastgele 4 soru seçelim
   const shuffled = [...course.sorular].sort(() => Math.random() - 0.5).slice(0, 4);
   
   matchingGamePool = shuffled.map((q, idx) => ({
     id: idx,
     questionText: q.soru,
     correctAnswerKey: q.cevap,
-    correctAnswerText: q.siklar[q.cevap]
+    correctAnswerText: q.siklar[q.cevap],
+    matched: false
   }));
 
   selectedTermCard = null;
@@ -699,10 +700,8 @@ function renderMatchingGameUI() {
     return;
   }
 
-  document.getElementById("popupQuestionText.innerHTML") = "";
   document.getElementById("popupQuestionText").innerText = "Soldan soru metnine tıklayın, sağdan doğru cevap kavramını seçerek eşleştirin:";
 
-  // Soruları sol tarafa, cevapları sağ tarafa karıştırarak dizelim
   const leftItems = [...matchingGamePool].filter(item => !item.matched).sort(() => Math.random() - 0.5);
   const rightItems = [...matchingGamePool].filter(item => !item.matched).sort(() => Math.random() - 0.5);
 
@@ -749,14 +748,12 @@ function selectRightMatchItem(id) {
   const rightItem = matchingGamePool.find(item => item.id === id);
 
   if (selectedTermCard.id === rightItem.id) {
-    // Doğru eşleşme!
     selectedTermCard.matched = true;
     matchedPairsCount++;
     selectedTermCard = null;
     playNotificationEffects();
     renderMatchingGameUI();
   } else {
-    // Yanlış eşleşme
     alert("❌ Bu eşleşme yanlış. Tekrar dene!");
     selectedTermCard = null;
     renderMatchingGameUI();
@@ -885,7 +882,6 @@ function applyFilters() {
   renderAll();
 }
 
-// SEÇİLEN SORU SAYISINA GÖRE TEST BAŞLATMA
 function startRandomExam() {
   const course = courses[activeCourseKey];
   if (!course || !course.sorular.length) return;
@@ -979,14 +975,6 @@ function navigateQuestion(step) {
     renderAll();
     if (isBlitzMode) startBlitzQuestionTimer();
   }
-}
-
-function finishBlitzMode() {
-  if (blitzTimerInterval) clearInterval(blitzTimerInterval);
-  isBlitzMode = false;
-  document.getElementById("reminderTimerBadge")?.classList.add("hidden");
-  alert("⚡ Blitz Modu tamamlandı! Harika bir hız pratiği yaptın.");
-  finishCurrentTestAnytime();
 }
 
 function jumpToQuestion(idx) {
@@ -1292,7 +1280,6 @@ function normalizeCourseName(str) {
   return (str || "").toLowerCase().replace(/[^a-z0-9ğüşıöç]/g, "");
 }
 
-// 20yygarmusltarvize1.json Veya Diğer Tüm Düz Soru Dizilerini SİLMEDEN BİRLEŞTİREN AKILLI İTHALAT MİMARİSİ
 function importCustomCourse() {
   const raw = document.getElementById("importJsonInput").value.trim();
   const statusEl = document.getElementById("importStatus");
@@ -1300,7 +1287,6 @@ function importCustomCourse() {
   try {
     const parsed = JSON.parse(raw);
 
-    // Durum A: Doğrudan düz soru dizisi (Array) formatındaysa
     if (Array.isArray(parsed)) {
       if (parsed.length === 0) throw new Error("JSON dizisi boş.");
       
@@ -1341,7 +1327,6 @@ function importCustomCourse() {
         };
       });
 
-      // Eski sorular SİLİNMEZ! Soru metnine göre map ile birleştirilir.
       const existingQuestions = courses[targetKey]?.sorular || [];
       const mergedMap = new Map();
       existingQuestions.forEach(q => mergedMap.set(q.soru.trim(), q));
@@ -1367,7 +1352,6 @@ function importCustomCourse() {
       return;
     }
 
-    // Durum B: Standart Obje Formatı
     if (!parsed.ders_adi && typeof parsed === "object") {
       let importedCount = 0;
       Object.keys(parsed).forEach(k => {
@@ -1474,7 +1458,6 @@ function importCustomCourse() {
   }
 }
 
-// Günlük Seri (Streak) Yönetimi
 function getStreakData() {
   try {
     const data = JSON.parse(localStorage.getItem("auzef_streak_data") || "{}");
@@ -1979,7 +1962,8 @@ function installPWAApp() {
     alert("Tarayıcınızın menüsünden 'Ana Ekrana Ekle' seçeneğini kullanabilirsiniz.");
   }
 }
-  if ('serviceWorker' in navigator) {
+
+if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW hata:', err));
 }
 </script>
