@@ -4,8 +4,16 @@
   "short_name": "AUZEF Sınav",
   "description": "AUZEF öğrencileri için ünite ve vize soruları içeren, çevrimdışı çalışabilen ve akıllı koçluk bildirimleri sunan interaktif sınav platformu.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "portrait",
+  "lang": "tr",
+  "dir": "ltr",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
   "categories": [
