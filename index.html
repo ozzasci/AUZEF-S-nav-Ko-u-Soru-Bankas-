@@ -648,90 +648,125 @@ function saveJsonChanges() {
   }
 }
 
-// Kavram Eşleştirme Bulmaca Modu Fonksiyonları
-let matchingGamePool = [];
-let selectedTermCard = null;
-let matchedPairsCount = 0;
+// Osmanlı İktisat Tarihi PDF Notlarından Derlenen Zengin Bulmaca Havuzu
+const customIktisatPuzzlePool = [
+  { question: "Modern kapitalizmin bir ürünü olarak ortaya çıkan, bireyin kendi faydasını artıracak şekilde karar alması düşüncesini ve tümdengelimci yöntemi ön plana çıkaran bilim dalıdır.", answer: "Kapitalist İktisat Bilimi" },
+  { question: "İktisat tarihinin doğuşunda öncü olan ve Ricardo geleneğinin mutlakçılığına karşı iktisadî izafiyeti (relativism) savunan ekoldür.", answer: "Alman Tarihçi Okulu" },
+  { question: "Osmanlı iktisat politikasının üç temel ilkesinden biri olan, iktisadî faaliyete tüketici açısından bakan ve temel hedefi piyasada mal arzını bol, kaliteli ve ucuz tutmak olan ilkedir.", answer: "İaşe" },
+  { question: "Osmanlı iktisadiyetinde hazineye ait gelirleri mümkün olduğu kadar yüksek düzeye çıkarmaya ve inmesini engellemeye çalışan maliye politikası ilkesidir.", answer: "Fiskalizm" },
+  { question: "Osmanlı maliyesinde gelir ve masrafların günlük olarak kayıtlarının tutulduğu en önemli hazine kalemidir.", answer: "Ruznamçe-i Evvel" },
+  { question: "Padişahın özel hazinesi olan, Hazine-i Amire'ye para kalmadığı zaman borç veren ve nakit akışını destekleyen iç hazinedir.", answer: "Enderun Hazinesi" },
+  { question: "Osmanlı Devleti'nde Mısır'dan gönderilen yıllık vergilerin ve padişah şahsî masraflarının karşılandığı, âmiri 'sır kâtibi' olan hazinedir.", answer: "Ceyb-i Hümâyûn" },
+  { question: "III. Selim döneminde Nizâm-ı Cedîd ordusunun masraflarını karşılamak amacıyla 1793 yılında kurulan hazinedir.", answer: "İrâd-ı Cedîd" },
+  { question: "II. Mahmud devrinde yeniçeriliğin kaldırılmasından sonra Asâkir-i Mansûre-i Muhammediye ordusunun ihtiyaçları için kurulan hazinedir.", answer: "Mansure Hazinesi" },
+  { question: "Tanzimat döneminde dış borçlanmaların devleti iflasa sürüklemesi üzerine 20 Aralık 1881 tarihinde yayımlanan kararname ile kurulan ve 'devlet içinde devlet' olarak anılan idaredir.", answer: "Düyûn-ı Umûmiye" },
+  { question: "Osmanlı toprak sisteminde mîrî (devlet) mülkiyeti altındaki arazilerin, gelirleriyle asker (cebelü) beslemek şartıyla memurlara ve sipahilere verilmesi sistemidir.", answer: "Tımar Sistemi" },
+  { question: "Toprağını haklı bir mazeret olmaksızın terk edip başka bir iş tutan köylünün sipahiye ödemek zorunda olduğu bir senelik mahsul karşılığı cezaî vergidir.", answer: "Çiftbozan" },
+  { question: "Yıllık nakdî belirli gelir getiren devlet müesseselerinin veya vergi kaynaklarının ihale yoluyla işletmeciliğe verilmesi sistemidir.", answer: "İltizam" },
+  { question: "Mukataaların ömür boyu satışı yerine, hisselere (cüzlere) ayrılarak halka satılması suretiyle uygulanan Osmanlı iç borçlanma türüdür.", answer: "Esham" },
+  { question: "Tüccar ve esnafın toplandığı, kıymetli kumaşların ve mücevheratın depolanıp demir kapılarla korunduğu kapalı çarşı bölümüdür.", answer: "Bedestan" },
+  { question: "Yed-i vâhid, ihraç yasakları ve tezkire isteme usulünün kaldırıldığı, yabancı tüccara geniş haklar tanınan 1838 tarihli ticaret antlaşmasıdır.", answer: "Balta Limanı" },
+  { question: "Ziraî işletmecilikte emek ile toprağı tasarruf eden arasındaki mahsulden yüzde oranında pay almaya dayanan ortakçı tarım usulüdür.", answer: "Yarıcılık" },
+  { question: "Osmanlı para tarihinde altın ve gümüş paranın bir arada basıldığı devre verilen adıdır.", answer: "Bimetalizm" },
+  { question: "Polonya menşeli olan ve Osmanlıların kuruştan daha fazla bastıkları sikke birimidir.", answer: "Zolota" },
+  { question: "Kitap ehli gayr-i müslimlerden, devlet tarafından korunmaları ve askerlikten muaf tutulmaları karşılığında alınan baş vergisidir.", answer: "Cizye" },
+  { question: "Dîvânın kararı ve padişahın emriyle olağanüstü hallerde aynî, nakdî veya hizmet olarak toplanan örfî vergilerin genel adıdır.", answer: "Avârız" }
+];
+
+let currentPuzzleItem = null;
+let puzzleScore = 0;
 
 function startMatchingGameModal() {
-  const course = courses[activeCourseKey];
-  if (!course || !Array.isArray(course.sorular) || course.sorular.length < 4) {
-    alert("Bu mod için derste en az 4 soru bulunmalıdır.");
-    return;
-  }
-
-  const shuffled = [...course.sorular].sort(() => Math.random() - 0.5).slice(0, 4);
+  if (!customIktisatPuzzlePool || customIktisatPuzzlePool.length === 0) return;
   
-  matchingGamePool = shuffled.map((q, idx) => ({
-    id: idx,
-    questionText: q.soru,
-    correctAnswerKey: q.cevap,
-    correctAnswerText: q.siklar[q.cevap],
-    matched: false
-  }));
+  // Rastgele bir bulmaca sorusu seçelim
+  const randomIndex = Math.floor(Math.random() * customIktisatPuzzlePool.length);
+  currentPuzzleItem = customIktisatPuzzlePool[randomIndex];
 
-  selectedTermCard = null;
-  matchedPairsCount = 0;
-  renderMatchingGameUI();
+  renderPuzzleUI();
 
   document.getElementById("popupQuestionModal").classList.remove("hidden");
   document.getElementById("popupQuestionModal").classList.add("flex");
 }
 
-function renderMatchingGameUI() {
-  document.getElementById("popupModalHeaderTitle").innerText = "🧩 Kavram & Soru Eşleştirme Bulmacası";
-  document.getElementById("popupCourseTitle").innerText = courses[activeCourseKey].ders_adi;
-  document.getElementById("popupSectionBadge").innerText = `Eşleşen: ${matchedPairsCount} / 4`;
+function renderPuzzleUI() {
+  document.getElementById("popupModalHeaderTitle").innerText = "🧩 Osmanlı İktisat Tarihi - Kavram Bulmacası";
+  document.getElementById("popupCourseTitle").innerText = "Özet Klavuzu & Ders Notları Bulmacası";
+  document.getElementById("popupSectionBadge").innerText = `Skor: ${puzzleScore}`;
   document.getElementById("finish10QuizEarlyBtn")?.classList.add("hidden");
   document.getElementById("popupNextBtn").classList.add("hidden");
   document.getElementById("popupFeedbackBox").classList.add("hidden");
 
-  if (matchedPairsCount === 4) {
-    document.getElementById("popupQuestionText").innerHTML = `
-      <div class="text-center py-6 space-y-3">
-        <div class="text-3xl">🏆</div>
-        <h4 class="font-extrabold text-emerald-800 text-base">Tebrikler Bulmacayı Tamamladın!</h4>
-        <p class="text-xs text-slate-600">Tüm kavramları başarıyla eşleştirdin. Beyin jimnastiği tamamlandı!</p>
-      </div>
-    `;
-    document.getElementById("popupOptionsList").innerHTML = `
-      <button onclick="startMatchingGameModal()" class="w-full py-2.5 rounded-xl bg-teal-700 text-white font-bold text-xs">🔄 Tekrar Oyna</button>
-    `;
-    return;
+  // Cevabı harflerine ayıralım veya boşluk doldurma kutusu yapalım
+  const ans = currentPuzzleItem.answer;
+  let maskedAnswer = "";
+  for (let i = 0; i < ans.length; i++) {
+    if (ans[i] === " ") maskedAnswer += " &nbsp; ";
+    else maskedAnswer += "_ ";
   }
 
-  document.getElementById("popupQuestionText").innerText = "Soldan soru metnine tıklayın, sağdan doğru cevap kavramını seçerek eşleştirin:";
-
-  const leftItems = [...matchingGamePool].filter(item => !item.matched).sort(() => Math.random() - 0.5);
-  const rightItems = [...matchingGamePool].filter(item => !item.matched).sort(() => Math.random() - 0.5);
-
-  let html = `
-    <div class="grid grid-cols-2 gap-3 text-xs my-2">
-      <div class="space-y-2">
-        <div class="font-bold text-slate-500 uppercase text-[10px]">Sorular</div>
+  document.getElementById("popupQuestionText").innerHTML = `
+    <div class="space-y-3">
+      <div class="p-3.5 bg-slate-50 border rounded-xl text-slate-800 font-medium text-xs sm:text-sm leading-relaxed">
+        💡 <strong>Tanım / İpucu:</strong> ${currentPuzzleItem.question}
+      </div>
+      <div class="text-center py-2">
+        <span class="text-[11px] text-slate-500 uppercase font-bold block mb-1">Bulunacak Kavram (${ans.length} Harf):</span>
+        <div id="puzzleMaskDisplay" class="text-lg font-mono font-extrabold tracking-widest text-blue-900">${maskedAnswer}</div>
+      </div>
+    </div>
   `;
 
-  leftItems.forEach(item => {
-    const isSelected = selectedTermCard && selectedTermCard.id === item.id;
+  // Şıklar veya tahmin kutusu oluşturalım
+  // Doğru cevabı ve havuzdan rastgele 3 yanlış cevabı şık olarak sunalım
+  let optionsList = [ans];
+  while (optionsList.length < 4) {
+    const randomWrong = customIktisatPuzzlePool[Math.floor(Math.random() * customIktisatPuzzlePool.length)].answer;
+    if (!optionsList.includes(randomWrong)) {
+      optionsList.push(randomWrong);
+    }
+  }
+  optionsList.sort(() => Math.random() - 0.5);
+
+  let html = `<div class="space-y-2 mt-2">`;
+  optionsList.forEach((opt, idx) => {
+    const optKey = String.fromCharCode(65 + idx); // A, B, C, D
     html += `
-      <div onclick="selectLeftMatchItem(${item.id})" class="p-3 rounded-xl border-2 cursor-pointer transition ${isSelected ? 'border-blue-600 bg-blue-50 font-bold' : 'border-slate-200 bg-white hover:border-slate-300'}">
-        ${item.questionText.length > 50 ? item.questionText.slice(0, 47) + '...' : item.questionText}
-      </div>
+      <button onclick="checkPuzzleAnswer('${opt.replace(/'/g, "\\'")}', '${ans.replace(/'/g, "\\'")}')" class="option-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-blue-500 flex items-center gap-3 text-xs sm:text-sm font-semibold text-slate-800 transition">
+        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">${optKey}</span>
+        <span>${opt}</span>
+      </button>
     `;
   });
+  html += `</div>`;
 
-  html += `</div><div class="space-y-2"><div class="font-bold text-slate-500 uppercase text-[10px]">Doğru Cevaplar</div>`;
-
-  rightItems.forEach(item => {
-    html += `
-      <div onclick="selectRightMatchItem(${item.id})" class="p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-teal-500 cursor-pointer transition">
-        <strong class="text-teal-800">${item.correctAnswerKey})</strong> ${item.correctAnswerText.length > 40 ? item.correctAnswerText.slice(0, 37) + '...' : item.correctAnswerText}
-      </div>
-    `;
-  });
-
-  html += `</div></div>`;
   document.getElementById("popupOptionsList").innerHTML = html;
+}
+
+function checkPuzzleAnswer(selectedOpt, correctOpt) {
+  const isCorrect = selectedOpt === correctOpt;
+  if (isCorrect) {
+    puzzleScore += 10;
+    playNotificationEffects();
+  }
+
+  const feedbackBox = document.getElementById("popupFeedbackBox");
+  feedbackBox.className = `mt-3 p-3 rounded-xl text-xs font-semibold ${isCorrect ? "bg-emerald-50 text-emerald-900 border border-emerald-200" : "bg-rose-50 text-rose-900 border border-rose-200"}`;
+  feedbackBox.innerHTML = isCorrect 
+    ? `✓ <strong>Tebrikler, Doğru Tahmin!</strong> Doğru kavram: <strong>${correctOpt}</strong>`
+    : `✗ <strong>Yanlış Tahmin.</strong> Doğru kavram olmalıydı: <strong>${correctOpt}</strong>`;
+  feedbackBox.classList.remove("hidden");
+
+  // Maskeli alanı açıp tam cevabı gösterelim
+  document.getElementById("puzzleMaskDisplay").innerText = correctOpt;
+  document.getElementById("puzzleMaskDisplay").className = "text-lg font-mono font-extrabold text-emerald-700 tracking-wider";
+
+  // Butonları devre dışı bırakıp "Sonraki Bulmaca" butonu ekleyelim
+  document.getElementById("popupOptionsList").innerHTML = `
+    <button onclick="startMatchingGameModal()" class="w-full py-3 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs transition shadow-sm">
+      ➡️ Sonraki Bulmacaya Geç
+    </button>
+  `;
 }
 
 function selectLeftMatchItem(id) {
