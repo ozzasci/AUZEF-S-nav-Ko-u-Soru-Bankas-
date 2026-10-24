@@ -648,118 +648,110 @@ function saveJsonChanges() {
   }
 }
 
-// Tüm Osmanlı ve Cumhuriyet Dönemi Tarihi PDF Notlarından (İktisat, Teşkilat, Kültür, Diplomasi ve 20. YY Gayrimüslimler) Eksiksiz Derlenen Tam Bulmaca Havuzu
+// Tüm Osmanlı ve Cumhuriyet Dönemi Tarihi PDF Notlarından Eksiksiz Derlenen Tam Bulmaca Havuzu
 const customPuzzlePool = [
-  // İktisat Tarihi
-  { question: "Modern kapitalizmin bir ürünü olarak ortaya çıkan, bireyin kendi faydasını artıracak şekilde karar alması düşüncesini ve tümdengelimci yöntemi ön plana çıkaran bilim dalıdır.", answer: "Kapitalist İktisat Bilimi" },
-  { question: "İktisat tarihinin doğuşunda öncü olan ve Ricardo geleneğinin mutlakçılığına karşı iktisadî izafiyeti (relativism) savunan ekoldür.", answer: "Alman Tarihçi Okulu" },
-  { question: "Osmanlı iktisat politikasının üç temel ilkesinden biri olan, iktisadî faaliyete tüketici açısından bakan ve temel hedefi piyasada mal arzını bol, kaliteli ve ucuz tutmak olan ilkedir.", answer: "İaşe" },
-  { question: "Osmanlı iktisadiyetinde hazineye ait gelirleri mümkün olduğu kadar yüksek düzeye çıkarmaya ve inmesini engellemeye çalışan maliye politikası ilkesidir.", answer: "Fiskalizm" },
-  { question: "Osmanlı maliyesinde gelir ve masrafların günlük olarak kayıtlarının tutulduğu en önemli hazine kalemidir.", answer: "Ruznamçe-i Evvel" },
-  { question: "Padişahın özel hazinesi olan, Hazine-i Amire'ye para kalmadığı zaman borç veren ve nakit akışını destekleyen iç hazinedir.", answer: "Enderun Hazinesi" },
-  { question: "Osmanlı Devleti'nde Mısır'dan gönderilen yıllık vergilerin ve padişah şahsî masraflarının karşılandığı, âmiri 'sır kâtibi' olan hazinedir.", answer: "Ceyb-i Hümâyûn" },
-  { question: "III. Selim döneminde Nizâm-ı Cedîd ordusunun masraflarını karşılamak amacıyla 1793 yılında kurulan hazinedir.", answer: "İrâd-ı Cedîd" },
-  { question: "II. Mahmud devrinde yeniçeriliğin kaldırılmasından sonra Asâkir-i Mansûre-i Muhammediye ordusunun ihtiyaçları için kurulan hazinedir.", answer: "Mansure Hazinesi" },
-  { question: "Tanzimat döneminde dış borçlanmaların devleti iflasa sürüklemesi üzerine 20 Aralık 1881 tarihinde yayımlanan kararname ile kurulan ve 'devlet içinde devlet' olarak anılan idaredir.", answer: "Düyûn-ı Umûmiye" },
-  { question: "Osmanlı toprak sisteminde mîrî (devlet) mülkiyeti altındaki arazilerin, gelirleriyle asker (cebelü) beslemek şartıyla memurlara ve sipahilere verilmesi sistemidir.", answer: "Tımar Sistemi" },
-  { question: "Toprağını haklı bir mazeret olmaksızın terk edip başka bir iş tutan köylünün sipahiye ödemek zorunda olduğu bir senelik mahsul karşılığı cezaî vergidir.", answer: "Çiftbozan" },
-  { question: "Yıllık nakdî belirli gelir getiren devlet müesseselerinin veya vergi kaynaklarının ihale yoluyla işletmeciliğe verilmesi sistemidir.", answer: "İltizam" },
-  { question: "Mukataaların ömür boyu satışı yerine, hisselere (cüzlere) ayrılarak halka satılması suretiyle uygulanan Osmanlı iç borçlanma türüdür.", answer: "Esham" },
-  { question: "Tüccar ve esnafın toplandığı, kıymetli kumaşların ve mücevheratın depolanıp demir kapılarla korunduğu kapalı çarşı bölümüdür.", answer: "Bedestan" },
-  { question: "Yed-i vâhid, ihraç yasakları ve tezkire isteme usulünün kaldırıldığı, yabancı tüccara geniş haklar tanınan 1838 tarihli ticaret antlaşmasıdır.", answer: "Balta Limanı" },
-  { question: "Ziraî işletmecilikte emek ile toprağı tasarruf eden arasındaki mahsulden yüzde oranında pay almaya dayanan ortakçı tarım usulüdür.", answer: "Yarıcılık" },
-  { question: "Osmanlı para tarihinde altın ve gümüş paranın bir arada basıldığı devre verilen adıdır.", answer: "Bimetalizm" },
-  { question: "Polonya menşeli olan ve Osmanlıların kuruştan daha fazla bastıkları sikke birimidir.", answer: "Zolota" },
-  { question: "Kitap ehli gayr-i müslimlerden, devlet tarafından korunmaları ve askerlikten muaf tutulmaları karşılığında alınan baş vergisidir.", answer: "Cizye" },
-  { question: "Dîvânın kararı ve padişahın emriyle olağanüstü hallerde aynî, nakdî veya hizmet olarak toplanan örfî vergilerin genel adıdır.", answer: "Avârız" },
-
-  // Teşkilat ve Kültür Tarihi / Medeniyet
-  { question: "Osmanlı devletinde ilk maliye teşkilatını kuran padişah kimdir?", answer: "I. Murad" },
-  { question: "Osmanlı Devleti'nde ilmiye teşkilatının reisi olan, protokolde veziriazamın bile üstünde yer alan ve ilk ataması II. Murad zamanında yapılan makam hangisidir?", answer: "Şeyhülislâmlık" },
-  { question: "Fâtih Sultan Mehmed döneminde İstanbul'da kurulan 8 medresenin genel adı nedir?", answer: "Sahn-ı Seman" },
-  { question: "Osmanlı donanmasının ilk komutanı ve Karamürsel'de ilk tersaneyi kuran denizci kimdir?", answer: "Karamürsel Alp" },
-  { question: "Osmanlı siyasi, adli, mali, askeri alanlarda alınan kararların görüşülüp karara bağlandığı yürütme ve danışma organı olan divanın padişah haricinde başkanlık eden mutlak vekili kimdir?", answer: "Sadrazam" },
-  { question: "Padişahların tesis ettiği büyük külliyelere arazi, han, hamam ve dükkân gibi zengin kaynaklar tahsis etmesi sistemine ne ad verilir?", answer: "Evkaf-ı Selâtin" },
-  { question: "Topkapı Sarayı'nda, tamamıyla Avrupa üslûbunda inşa edilen son binanın adı nedir?", answer: "Mecidiye Köşkü" },
-  { question: "Valide sultanların has türünden toprak gelirlerine verilen ad nedir?", answer: "Paşmaklık" },
-  { question: "Topkapı Sarayı'nda XVII-XVIII. asırlarda şehzadelerin hayatlarını geçirdikleri Harem kısmındaki dairenin adı nedir?", answer: "Şimşirlik" },
-  { question: "Veziriazamların seferde bulundukları zaman merkezdeki işlerin yürümesini sağlamak için yerlerine bıraktıkları vekil kimdir?", answer: "Sadaret Kaymakamı" },
-  { question: "Padişah adına yazılacak fermanlara ve beratlara tuğra çeken, devlet arazi kayıtlarını (tahrir) tutan divan üyesi kimdir?", answer: "Nişancı" },
-  { question: "XVII. yüzyıl sonlarına kadar Divân-ı hümâyun kâtiplerinin ve kalemlerinin şefi olan, dış yazışmaları yürüten görevli kimdir?", answer: "Reisülküttâb" },
-  { question: "Mühimme Defterlerinin tutulduğu ve divan kararlarının yazıldığı kalemin adı nedir?", answer: "Beylikçi (Divân) Kalemi" },
-  { question: "Devletin resmî tarihçisi hüviyetinde bulunan, ilk temsilcisi Halepli Mustafa Nâima Efendi olan görevli kimdir?", answer: "Vekayinüvis" },
-  { question: "Sâliyâneli eyaletler arasında yer alan, gelirleri doğrudan devlet namına toplanıp masraflar düşüldükten sonra kalanı merkeze gönderilen önemli eyalet hangisidir?", answer: "Mısır" },
-  { question: "Beylerbeyi ve sancak beylerinin sefer veya başka sebeplerle yerlerinde bulunamadıkları zaman bıraktıkları vekillere ne denir?", answer: "Mütesellim" },
-  { question: "Yeniçerilerin isyan öncesi kendilerince kutsal sayılan kazanlarını Etmeydanı'na çıkartmaları eylemine ne ad verilir?", answer: "Kazan Kaldırma" },
-  { question: "1729 yılında Osmanlı'ya iltica edip Müslüman olduktan sonra neferlerinin tamamı ulûfeli yeni bir humbaracı sınıfı kuran uzman kimdir?", answer: "Humbaracı Ahmed Paşa" },
-  { question: "II. Mahmud tarafından yeniçeriliğin kaldırılması üzerine 1826'da kurulan yeni ordu biriminin adı nedir?", answer: "Asâkir-i Mansûre-i Muhammediye" },
-  { question: "Osmanlı minyatür ressamlarına verilen geleneksel unvan nedir?", answer: "Musavvir" },
-  { question: "Fatih Sultan Mehmed'in Topkapı Sarayı'nda kurdurduğu nakşhane için sernakkaş olarak getirdiği Özbek asıllı sanatçı kimdir?", answer: "Baba Nakkaş" },
-  { question: "Kanunî Sultan Süleyman'ın devrini ve şenliklerini anlatan eserleri resmeden, Osmanlı minyatür üslubunu yönlendiren baş nakşî kimdir?", answer: "Nakkaş Osman" },
-  { question: "Türk Hat Sanatının pîri kabul edilen, Amasya'da Fatih'in kütüphanesi için eserler yazmış olan ünlü hattat kimdir?", answer: "Şeyh Hamdullah" },
-  { question: "Osmanlılarda maliye ve tapu kayıtlarının tutulduğu, sanat tarafı bulunmayan yazı çeşidinin adı nedir?", answer: "Siyakat" },
-  { question: "Osmanlı kitap tezhiplerinde ilk dönemden beri devam eden, sonsuzluğa giden ve sınırlandırılmamış kompozisyon anlayışına ne denir?", answer: "Ulama" },
-  { question: "Şahkulu'nun talebesi olan, 'Muhibbi Dîvânı'nı tezhip eden ve bahçe çiçeklerini tezhibe dahil eden XVI. yüzyıl müzehhibi kimdir?", answer: "Kara Memi" },
-  { question: "Mimar Sinan'ın II. Selim için Edirne'de inşa ettiği, mimarlık dehasının doruk noktası olan abidevi eserin adı nedir?", answer: "Selimiye Camii" },
-  { question: "Süleyman Çelebi'nin 1409'da Bursa'da yazdığı, tüm zamanların en fazla şöhret kazanan dinî Türk edebiyatı mahsulü nedir?", answer: "Vesîletü'n-Necat (Mevlid)" },
-  { question: "II. Mahmud tarafından 1828'de kapatılıp yerine Napolyon'un emekli bando subayına kurdurulan Batı kopyası saray bando okulunun adı nedir?", answer: "Mızıka-i Hümayun" },
-
-  // Diplomasi Tarihi
-  { question: "Orhun Abideleri'nde 'elçi' kelimesinin karşılığı olarak kullanılan terim nedir?", answer: "Yalabaç" },
-  { question: "Hititler ve eski Mısırlılar arasında imzalanan, diplomasi tarihinin bilinen ilk yazılı barış antlaşması hangisidir?", answer: "Kadeş Antlaşması" },
-  { question: "Antik Grek'te bir site devletine gelen tüccarların ticari haklarının korunması amacıyla oluşturulan, konsolosluğun ilk örneği olan kurum hangisidir?", answer: "Proksenos" },
-  { question: "Hz. Muhammed'in 628 yılında Mekke'deki Kureyş yönetimiyle bizzat müzakere yaparak imzaladığı, İslâm tarihinin ilk diplomatik metni nedir?", answer: "Hudeybiye Antlaşması" },
-  { question: "İtalyan şehir devletleri zamanında Filistin, Suriye, Mısır ve İstanbul'da ticari faaliyet gösteren konsoloslara verilen unvan nedir?", answer: "Bailo (Balyos)" },
-  { question: "Avrupa'da sürekli diplomasinin temellerinin atıldığı ve ilk defa çok taraflı diplomasinin uygulandığı kongre süreci hangisidir?", answer: "Vestfalya Kongresi" },
-  { question: "Siyasetin tek hedefinin güç ve yetki edinmek olduğunu savunan ve 'Prens' adlı eseri yazan 15. yüzyıl diplomasi teorisyeni kimdir?", answer: "Niccolo Machiavelli" },
-  { question: "Osmanlı diplomasi tarihinde bir dönüm noktası olan, hukuki eşitliğe dayalı kaleme alınan ilk Osmanlı antlaşması hangisidir?", answer: "Zitvatorok Antlaşması" },
-  { question: "Osmanlı Devleti'nde yabancı devletlerle yapılan barış şartlarını ve ticari ayrıcalıkları içeren, mütekabiliyet esası olmayan belgeye ne denir?", answer: "Ahidnâme" },
-  { question: "III. Selim döneminde Londra'ya tayin edilen, büyükelçi rütbeli ilk daimi Osmanlı elçisi kimdir?", answer: "Yusuf Agâh Efendi" },
-  { question: "Osmanlı'nın 1838'de İngiltere ile imzaladığı, yed-i vâhid (tekel) sisteminin ve ihraç yasaklarının kaldırıldığı antlaşma hangisidir?", answer: "Balta Limanı Muahedesi" },
-  { question: "Osmanlı'da tercüman ihtiyacının giderilmesi için Sultan II. Mahmud'un emri ile Babıâli içerisinde açılan kurumun adı nedir?", answer: "Tercüme Odası" },
-  { question: "Osmanlı'da dışişleri faaliyetlerini yürütmek üzere Sultan II. Mahmud'un emriyle 1836'da oluşturulan kurum hangisidir?", answer: "Umur-ı Hariciye Nezareti" },
-  { question: "Osmanlı'nın Kırım Savaşı sonrasında imzaladığı, Karadeniz'in tarafsızlaştırıldığı ve Avrupa devletler sisteminin eşit üyesi kabul edildiği antlaşma hangisidir?", answer: "Paris Antlaşması" },
-  { question: "Sultan II. Abdülhamid döneminde, dış borçların ödenmesi için Avrupalı alacaklılar ile yapılan finans antlaşmasının adı nedir?", answer: "Muharrem Kararnamesi" },
-  { question: "93 Harbi sonrasında Osmanlı tarihinin en ağır şartlarını içeren, Büyük Bulgaristan Prensliği'nin kurulmasını öngören imzalanan antlaşma hangisidir?", answer: "Ayastefanos Antlaşması" },
-  { question: "Osmanlı'nın Balkan Savaşları sonrasında Edirne'yi kaybedip Midye-Enez hattının batısındaki topraklarından çekilmeyi kabul ettiği antlaşma hangisidir?", answer: "Londra Antlaşması" },
-  { question: "Osmanlı Devleti'nin I. Dünya Savaşı'na fiilen girmesine yol açan, İngilizlerden kaçarak Boğazlar'a gelen Alman savaş gemilerinin adları nelerdir?", answer: "Goeben ve Breslau (Yavuz ve Midilli)" },
-  { question: "Osmanlı Devleti'nin I. Dünya Savaşı sonunda imzaladığı, müttefiklere istedikleri mevkileri işgal hakkı veren mütareke hangisidir?", answer: "Mondros Mütarekesi" },
-  { question: "Yurtdışına yollanan Osmanlı elçilerinin gözlemlerini ve diplomatik faaliyetlerini bildirmek amacıyla kaleme aldıkları raporlara ne denir?", answer: "Sefaretname" },
-  { question: "Fransa'nın Mısır'ı işgaliyle Akdeniz'de dengelerin değişmesi ve Osmanlı'nın paylaşılması projelerine verilen genel ad nedir?", answer: "Doğu Meselesi (Eastern Question)" },
-  { question: "Ebubekir Ratip Efendi'nin kaleme aldığı, Avrupa'nın askeri, idari ve mali teşkilatı hakkında incelemeye dayanan geniş rapora ne ad verilir?", answer: "Büyük Layiha" },
-  { question: "İngiltere Dışişleri Bakanı Arthur James Balfour'un mektubuyla Filistin'de Yahudilere ait bir yurt oluşturulması çabasını gösteren belge nedir?", answer: "Balfour Deklerasyonu" },
-  { question: "Doğu Sorunu'nun kesin çözümü adına Osmanlı'nın yok edilmesi anlamını taşıyan, imzalanan en ağır içerikli antlaşma hangisidir?", answer: "Sevr Barış Antlaşması" },
-
-  // 20. YY Türkiye'sinde Gayrimüslimler ve Kurumları
-  { question: "Osmanlı'da Müslümanlara verilen resmî unvan nedir?", answer: "Millet-i Hâkime" },
-  { question: "Osmanlı'da tebaa dışından olan yabancılara verilen ad nedir?", answer: "Levantenler" },
-  { question: "Millet başı olan patriklerin, göreve gelirken ödedikleri verginin adı nedir?", answer: "Pişkeş vergisi" },
-  { question: "Hahambaşıların ödedikleri vergiye ne denirdi?", answer: "Rav Akçesi" },
-  { question: "Dinî liderlerin emirlerinde bulunan yeniçerilerden oluşan askerî birliklere ne denirdi?", answer: "Yasakçı" },
-  { question: "Fetih sonrası İstanbul'un ilk hahambaşısı kimdir?", answer: "Moşe Kapsali" },
-  { question: "Ermenilerin papalığa bağlanarak patriklikle Roma kilisesini birleştirmeyi hedefleyen Sivaslı Katolik rahibi kimdir?", answer: "Mıhitar" },
-  { question: "Katolik Ermeniler için hazırlanan ilk nizamname hangi tarihlidir?", answer: "1850 Katolik Milleti Nizamnamesi" },
-  { question: "Osmanlı sınırlarında en yaygın misyonerlik faaliyetlerini yürüten Protestan kökenli Amerikan örgütü hangisidir?", answer: "ABCFM" },
-  { question: "Osmanlı'da ilk Protestan kilisesi hangi yıl nerede açılmıştır?", answer: "1846 İstanbul" },
-  { question: "Gayrimüslimlerin askerlik yapmamaları karşılığında ödedikleri verginin son dönemdeki adı nedir?", answer: "Bedel-i Askerî" },
-  { question: "Bulgar millî hareketinin 18. yüzyıldaki uyanışının öncüsü kabul edilen keşiş kimdir?", answer: "Paisiy Hilendarski" },
-  { question: "Sultan Abdülaziz'in Rum Patrikhanesi'nin idaresinden çıkıp bağımsız Bulgar Kilisesi kurulmasını kabul ettiği fermanın adı nedir?", answer: "Eksarhlık Fermanı" },
-  { question: "İttihatçılara yakınlığı ile bilinen, Fransız yanlısı ilerici din adamı olarak tanınan hahambaşı kimdir?", answer: "Haim Nahum Efendi" },
-  { question: "Anadolu'da yaşayan Türk Ortodokslarının lideri olan ve 'Türk oğlu Türk Eftim'im' diyen din adamı kimdir?", answer: "Papa Eftim" },
-  { question: "Lozan Antlaşması'nda azınlıkları ilgilendiren maddelerin yer aldığı kısım kaçıncı maddeler arasındadır?", answer: "37 - 45. maddeler" },
-  { question: "Cumhuriyet döneminin 1863 nizamnamesine göre seçilen ilk patriği kimdir?", answer: "Mesrob Naroyan" },
-  { question: "Heybeliada Ruhban Okulu hangi yılda kapatılmıştır?", answer: "1971" }
+  { question: "Modern kapitalizmin bir ürünü olarak ortaya çıkan, bireyin kendi faydasını artıracak şekilde karar alması düşüncesini ve tümdengelimci yöntemi ön plana çıkaran bilim dalıdır[cite: 30].", answer: "Kapitalist İktisat Bilimi" },
+  { question: "İktisat tarihinin doğuşunda öncü olan ve Ricardo geleneğinin mutlakçılığına karşı iktisadî izafiyeti (relativism) savunan ekoldür[cite: 30].", answer: "Alman Tarihçi Okulu" },
+  { question: "Osmanlı iktisat politikasının üç temel ilkesinden biri olan, iktisadî faaliyete tüketici açısından bakan ve temel hedefi piyasada mal arzını bol, kaliteli ve ucuz tutmak olan ilkedir[cite: 32].", answer: "İaşe" },
+  { question: "Osmanlı iktisadiyetinde hazineye ait gelirleri mümkün olduğu kadar yüksek düzeye çıkarmaya ve inmesini engellemeye çalışan maliye politikası ilkesidir[cite: 32].", answer: "Fiskalizm" },
+  { question: "Osmanlı maliyesinde gelir ve masrafların günlük olarak kayıtlarının tutulduğu en önemli hazine kalemidir[cite: 34].", answer: "Ruznamçe-i Evvel" },
+  { question: "Padişahın özel hazinesi olan, Hazine-i Amire'ye para kalmadığı zaman borç veren ve nakit akışını destekleyen iç hazinedir[cite: 31, 36].", answer: "Enderun Hazinesi" },
+  { question: "Osmanlı Devleti'nde Mısır'dan gönderilen yıllık vergilerin ve padişah şahsî masraflarının karşılandığı, âmiri 'sır kâtibi' olan hazinedir[cite: 36].", answer: "Ceyb-i Hümâyûn" },
+  { question: "III. Selim döneminde Nizâm-ı Cedîd ordusunun masraflarını karşılamak amacıyla 1793 yılında kurulan hazinedir[cite: 36].", answer: "İrâd-ı Cedîd" },
+  { question: "II. Mahmud devrinde yeniçeriliğin kaldırılmasından sonra Asâkir-i Mansûre-i Muhammediye ordusunun ihtiyaçları için kurulan hazinedir[cite: 37].", answer: "Mansure Hazinesi" },
+  { question: "Tanzimat döneminde dış borçlanmaların devleti iflasa sürüklemesi üzerine 20 Aralık 1881 tarihinde yayımlanan kararname ile kurulan ve 'devlet içinde devlet' olarak anılan idaredir[cite: 41].", answer: "Düyûn-ı Umûmiye" },
+  { question: "Osmanlı toprak sisteminde mîrî (devlet) mülkiyeti altındaki arazilerin, gelirleriyle asker (cebelü) beslemek şartıyla memurlara ve sipahilere verilmesi sistemidir[cite: 38, 39].", answer: "Tımar Sistemi" },
+  { question: "Toprağını haklı bir mazeret olmaksızın terk edip başka bir iş tutan köylünün sipahiye ödemek zorunda olduğu bir senelik mahsul karşılığı cezaî vergidir[cite: 39, 45].", answer: "Çiftbozan" },
+  { question: "Yıllık nakdî belirli gelir getiren devlet müesseselerinin veya vergi kaynaklarının ihale yoluyla işletmeciliğe verilmesi sistemidir[cite: 40].", answer: "İltizam" },
+  { question: "Mukataaların ömür boyu satışı yerine, hisselere (cüzlere) ayrılarak halka satılması suretiyle uygulanan Osmanlı iç borçlanma türüdür[cite: 40].", answer: "Esham" },
+  { question: "Tüccar ve esnafın toplandığı, kıymetli kumaşların ve mücevheratın depolanıp demir kapılarla korunduğu kapalı çarşı bölümüdür[cite: 41].", answer: "Bedestan" },
+  { question: "Yed-i vâhid, ihraç yasakları ve tezkire isteme usulünün kaldırıldığı, yabancı tüccara geniş haklar tanınan 1838 tarihli ticaret antlaşmasıdır[cite: 41].", answer: "Balta Limanı" },
+  { question: "Ziraî işletmecilikte emek ile toprağı tasarruf eden arasındaki mahsulden yüzde oranında pay almaya dayanan ortakçı tarım usulüdür[cite: 42].", answer: "Yarıcılık" },
+  { question: "Osmanlı para tarihinde altın ve gümüş paranın bir arada basıldığı devre verilen adıdır[cite: 43].", answer: "Bimetalizm" },
+  { question: "Polonya menşeli olan ve Osmanlıların kuruştan daha fazla bastıkları sikke birimidir[cite: 43].", answer: "Zolota" },
+  { question: "Kitap ehli gayr-i müslimlerden, devlet tarafından korunmaları ve askerlikten muaf tutulmaları karşılığında alınan baş vergisidir[cite: 31, 44].", answer: "Cizye" },
+  { question: "Dîvânın kararı ve padişahın emriyle olağanüstü hallerde aynî, nakdî veya hizmet olarak toplanan örfî vergilerin genel adıdır[cite: 46].", answer: "Avârız" },
+  { question: "Osmanlı devletinde ilk maliye teşkilatını kuran padişah kimdir?[cite: 3]", answer: "I. Murad" },
+  { question: "Osmanlı Devleti'nde ilmiye teşkilatının reisi olan, protokolde veziriazamın bile üstünde yer alan ve ilk ataması II. Murad zamanında yapılan makam hangisidir?[cite: 6]", answer: "Şeyhülislâmlık" },
+  { question: "Fâtih Sultan Mehmed döneminde İstanbul'da kurulan 8 medresenin genel adı nedir?[cite: 10]", answer: "Sahn-ı Seman" },
+  { question: "Osmanlı donanmasının ilk komutanı ve Karamürsel'de ilk tersaneyi kuran denizci kimdir?[cite: 19]", answer: "Karamürsel Alp" },
+  { question: "Osmanlı siyasi, adli, mali, askeri alanlarda alınan kararların görüşülüp karara bağlandığı yürütme ve danışma organı olan divanın padişah haricinde başkanlık eden mutlak vekili kimdir?[cite: 23]", answer: "Sadrazam" },
+  { question: "Padişahların tesis ettiği büyük külliyelere arazi, han, hamam ve dükkân gibi zengin kaynaklar tahsis etmesi sistemine ne ad verilir?[cite: 49]", answer: "Evkaf-ı Selâtin" },
+  { question: "Topkapı Sarayı'nda, tamamıyla Avrupa üslûbunda inşa edilen son binanın adı nedir?[cite: 49]", answer: "Mecidiye Köşkü" },
+  { question: "Valide sultanların has türünden toprak gelirlerine verilen ad nedir?[cite: 49]", answer: "Paşmaklık" },
+  { question: "Topkapı Sarayı'nda XVII-XVIII. asırlarda şehzadelerin hayatlarını geçirdikleri Harem kısmındaki dairenin adı nedir?[cite: 50]", answer: "Şimşirlik" },
+  { question: "Veziriazamların seferde bulundukları zaman merkezdeki işlerin yürümesini sağlamak için yerlerine bıraktıkları vekil kimdir?[cite: 51]", answer: "Sadaret Kaymakamı" },
+  { question: "Padişah adına yazılacak fermanlara ve beratlara tuğra çeken, devlet arazi kayıtlarını (tahrir) tutan divan üyesi kimdir?[cite: 51]", answer: "Nişancı" },
+  { question: "XVII. yüzyıl sonlarına kadar Divân-ı hümâyun kâtiplerinin ve kalemlerinin şefi olan, dış yazışmaları yürüten görevli kimdir?[cite: 52]", answer: "Reisülküttâb" },
+  { question: "Mühimme Defterlerinin tutulduğu ve divan kararlarının yazıldığı kalemin adı nedir?[cite: 52]", answer: "Beylikçi (Divân) Kalemi" },
+  { question: "Devletin resmî tarihçisi hüviyetinde bulunan, ilk temsilcisi Halepli Mustafa Nâima Efendi olan görevli kimdir?[cite: 52]", answer: "Vekayinüvis" },
+  { question: "Sâliyâneli eyaletler arasında yer alan, gelirleri doğrudan devlet namına toplanıp masraflar düşüldükten sonra kalanı merkeze gönderilen önemli eyalet hangisidir?[cite: 53]", answer: "Mısır" },
+  { question: "Beylerbeyi ve sancak beylerinin sefer veya başka sebeplerle yerlerinde bulunamadıkları zaman bıraktıkları vekillere ne denir?[cite: 54]", answer: "Mütesellim" },
+  { question: "Yeniçerilerin isyan öncesi kendilerince kutsal sayılan kazanlarını Etmeydanı'na çıkartmaları eylemine ne ad verilir?[cite: 55]", answer: "Kazan Kaldırma" },
+  { question: "1729 yılında Osmanlı'ya iltica edip Müslüman olduktan sonra neferlerinin tamamı ulûfeli yeni bir humbaracı sınıfı kuran uzman kimdir?[cite: 55]", answer: "Humbaracı Ahmed Paşa" },
+  { question: "II. Mahmud tarafından yeniçeriliğin kaldırılması üzerine 1826'da kurulan yeni ordu biriminin adı nedir?[cite: 57]", answer: "Asâkir-i Mansûre-i Muhammediye" },
+  { question: "Osmanlı minyatür ressamlarına verilen geleneksel unvan nedir?[cite: 65]", answer: "Musavvir" },
+  { question: "Fatih Sultan Mehmed'in Topkapı Sarayı'nda kurdurduğu nakşhane için sernakkaş olarak getirdiği Özbek asıllı sanatçı kimdir?[cite: 69]", answer: "Baba Nakkaş" },
+  { question: "Kanunî Sultan Süleyman'ın devrini ve şenliklerini anlatan eserleri resmeden, Osmanlı minyatür üslubunu yönlendiren baş nakşî kimdir?[cite: 66]", answer: "Nakkaş Osman" },
+  { question: "Türk Hat Sanatının pîri kabul edilen, Amasya'da Fatih'in kütüphanesi için eserler yazmış olan ünlü hattat kimdir?[cite: 68]", answer: "Şeyh Hamdullah" },
+  { question: "Osmanlılarda maliye ve tapu kayıtlarının tutulduğu, sanat tarafı bulunmayan yazı çeşidinin adı nedir?[cite: 69]", answer: "Siyakat" },
+  { question: "Osmanlı kitap tezhiplerinde ilk dönemden beri devam eden, sonsuzluğa giden ve sınırlandırılmamış kompozisyon anlayışına ne denir?[cite: 69]", answer: "Ulama" },
+  { question: "Şahkulu'nun talebesi olan, 'Muhibbi Dîvânı'nı tezhip eden ve bahçe çiçeklerini tezhibe dahil eden XVI. yüzyıl müzehhibi kimdir?[cite: 70]", answer: "Kara Memi" },
+  { question: "Mimar Sinan'ın II. Selim için Edirne'de inşa ettiği, mimarlık dehasının doruk noktası olan abidevi eserin adı nedir?[cite: 71]", answer: "Selimiye Camii" },
+  { question: "Süleyman Çelebi'nin 1409'da Bursa'da yazdığı, tüm zamanların en fazla şöhret kazanan dinî Türk edebiyatı mahsulü nedir?[cite: 72]", answer: "Vesîletü'n-Necat (Mevlid)" },
+  { question: "II. Mahmud tarafından 1828'de kapatılıp yerine Napolyon'un emekli bando subayına kurdurulan Batı kopyası saray bando okulunun adı nedir?[cite: 74]", answer: "Mızıka-i Hümayun" },
+  { question: "Orhun Abideleri'nde 'elçi' kelimesinin karşılığı olarak kullanılan terim nedir?[cite: 75]", answer: "Yalabaç" },
+  { question: "Hititler ve eski Mısırlılar arasında imzalanan, diplomasi tarihinin bilinen ilk yazılı barış antlaşması hangisidir?[cite: 75]", answer: "Kadeş Antlaşması" },
+  { question: "Antik Grek'te bir site devletine gelen tüccarların ticari haklarının korunması amacıyla oluşturulan, konsolosluğun ilk örneği olan kurum hangisidir?[cite: 75]", answer: "Proksenos" },
+  { question: "Hz. Muhammed'in 628 yılında Mekke'deki Kureyş yönetimiyle bizzat müzakere yaparak imzaladığı, İslâm tarihinin ilk diplomatik metni nedir?[cite: 76]", answer: "Hudeybiye Antlaşması" },
+  { question: "İtalyan şehir devletleri zamanında Filistin, Suriye, Mısır ve İstanbul'da ticari faaliyet gösteren konsoloslara verilen unvan nedir?[cite: 76]", answer: "Bailo (Balyos)" },
+  { question: "Avrupa'da sürekli diplomasinin temellerinin atıldığı ve ilk defa çok taraflı diplomasinin uygulandığı kongre süreci hangisidir?[cite: 77]", answer: "Vestfalya Kongresi" },
+  { question: "Siyasetin tek hedefinin güç ve yetki edinmek olduğunu savunan ve 'Prens' adlı eseri yazan 15. yüzyıl diplomasi teorisyeni kimdir?[cite: 77]", answer: "Niccolo Machiavelli" },
+  { question: "Osmanlı diplomasi tarihinde bir dönüm noktası olan, hukuki eşitliğe dayalı kaleme alınan ilk Osmanlı antlaşması hangisidir?[cite: 82]", answer: "Zitvatorok Antlaşması" },
+  { question: "Osmanlı Devleti'nde yabancı devletlerle yapılan barış şartlarını ve ticari ayrıcalıkları içeren, mütekabiliyet esası olmayan belgeye ne denir?[cite: 79]", answer: "Ahidnâme" },
+  { question: "III. Selim döneminde Londra'ya tayin edilen, büyükelçi rütbeli ilk daimi Osmanlı elçisi kimdir?[cite: 85]", answer: "Yusuf Agâh Efendi" },
+  { question: "Osmanlı'nın 1838'de İngiltere ile imzaladığı, yed-i vâhid (tekel) sisteminin ve ihraç yasaklarının kaldırıldığı antlaşma hangisidir?[cite: 80]", answer: "Balta Limanı Muahedesi" },
+  { question: "Osmanlı'da tercüman ihtiyacının giderilmesi için Sultan II. Mahmud'un emri ile Babıâli içerisinde açılan kurumun adı nedir?[cite: 88]", answer: "Tercüme Odası" },
+  { question: "Osmanlı'da dışişleri faaliyetlerini yürütmek üzere Sultan II. Mahmud'un emriyle 1836'da oluşturulan kurum hangisidir?[cite: 88]", answer: "Umur-ı Hariciye Nezareti" },
+  { question: "Osmanlı'nın Kırım Savaşı sonrasında imzaladığı, Karadeniz'in tarafsızlaştırıldığı ve Avrupa devletler sisteminin eşit üyesi kabul edildiği antlaşma hangisidir?[cite: 91]", answer: "Paris Antlaşması" },
+  { question: "Sultan II. Abdülhamid döneminde, dış borçların ödenmesi için Avrupalı alacaklılar ile yapılan finans antlaşmasının adı nedir?[cite: 94]", answer: "Muharrem Kararnamesi" },
+  { question: "93 Harbi sonrasında Osmanlı tarihinin en ağır şartlarını içeren, Büyük Bulgaristan Prensliği'nin kurulmasını öngören imzalanan antlaşma hangisidir?[cite: 93]", answer: "Ayastefanos Antlaşması" },
+  { question: "Osmanlı'nın Balkan Savaşları sonrasında Edirne'yi kaybedip Midye-Enez hattının batısındaki topraklarından çekilmeyi kabul ettiği antlaşma hangisidir?[cite: 98]", answer: "Londra Antlaşması" },
+  { question: "Osmanlı Devleti'nin I. Dünya Savaşı'na fiilen girmesine yol açan, İngilizlerden kaçarak Boğazlar'a gelen Alman savaş gemilerinin adları nelerdir?[cite: 98]", answer: "Goeben ve Breslau (Yavuz ve Midilli)" },
+  { question: "Osmanlı Devleti'nin I. Dünya Savaşı sonunda imzaladığı, müttefiklere istedikleri mevkileri işgal hakkı veren mütareke hangisidir?[cite: 100]", answer: "Mondros Mütarekesi" },
+  { question: "Yurtdışına yollanan Osmanlı elçilerinin gözlemlerini ve diplomatik faaliyetlerini bildirmek amacıyla kaleme aldıkları raporlara ne denir?[cite: 81]", answer: "Sefaretname" },
+  { question: "Fransa'nın Mısır'ı işgaliyle Akdeniz'de dengelerin değişmesi ve Osmanlı'nın paylaşılması projelerine verilen genel ad nedir?[cite: 85]", answer: "Doğu Meselesi (Eastern Question)" },
+  { question: "Ebubekir Ratip Efendi'nin kaleme aldığı, Avrupa'nın askeri, idari ve mali teşkilatı hakkında incelemeye dayanan geniş rapora ne ad verilir?[cite: 85]", answer: "Büyük Layiha" },
+  { question: "İngiltere Dışişleri Bakanı Arthur James Balfour'un mektubuyla Filistin'de Yahudilere ait bir yurt oluşturulması çabasını gösteren belge nedir?[cite: 99]", answer: "Balfour Deklerasyonu" },
+  { question: "Doğu Sorunu'nun kesin çözümü adına Osmanlı'nın yok edilmesi anlamını taşıyan, imzalanan en ağır içerikli antlaşma hangisidir?[cite: 100]", answer: "Sevr Barış Antlaşması" },
+  { question: "Osmanlı'da Müslümanlara verilen resmî unvan nedir?[cite: 101]", answer: "Millet-i Hâkime" },
+  { question: "Osmanlı'da tebaa dışından olan yabancılara verilen ad nedir?[cite: 101]", answer: "Levantenler" },
+  { question: "Millet başı olan patriklerin, göreve gelirken ödedikleri verginin adı nedir?[cite: 101]", answer: "Pişkeş vergisi" },
+  { question: "Hahambaşıların ödedikleri vergiye ne denirdi?[cite: 101]", answer: "Rav Akçesi" },
+  { question: "Dinî liderlerin emirlerinde bulunan yeniçerilerden oluşan askerî birliklere ne denirdi?[cite: 101]", answer: "Yasakçı" },
+  { question: "Fetih sonrası İstanbul'un ilk hahambaşısı kimdir?[cite: 101]", answer: "Moşe Kapsali" },
+  { question: "Ermenilerin papalığa bağlanarak patriklikle Roma kilisesini birleştirmeyi hedefleyen Sivaslı Katolik rahibi kimdir?[cite: 101]", answer: "Mıhitar" },
+  { question: "Katolik Ermeniler için hazırlanan ilk nizamname hangi tarihlidir?[cite: 101]", answer: "1850 Katolik Milleti Nizamnamesi" },
+  { question: "Osmanlı sınırlarında en yaygın misyonerlik faaliyetlerini yürüten Protestan kökenli Amerikan örgütü hangisidir?[cite: 101]", answer: "ABCFM" },
+  { question: "Osmanlı'da ilk Protestan kilisesi hangi yıl nerede açılmıştır?[cite: 102]", answer: "1846 İstanbul" },
+  { question: "Gayrimüslimlerin askerlik yapmamaları karşılığında ödedikleri verginin son dönemdeki adı nedir?[cite: 102]", answer: "Bedel-i Askerî" },
+  { question: "Bulgar millî hareketinin 18. yüzyıldaki uyanışının öncüsü kabul edilen keşiş kimdir?[cite: 102]", answer: "Paisiy Hilendarski" },
+  { question: "Sultan Abdülaziz'in Rum Patrikhanesi'nin idaresinden çıkıp bağımsız Bulgar Kilisesi kurulmasını kabul ettiği fermanın adı nedir?[cite: 102]", answer: "Eksarhlık Fermanı" },
+  { question: "İttihatçılara yakınlığı ile bilinen, Fransız yanlısı ilerici din adamı olarak tanınan hahambaşı kimdir?[cite: 103]", answer: "Haim Nahum Efendi" },
+  { question: "Anadolu'da yaşayan Türk Ortodokslarının lideri olan ve 'Türk oğlu Türk Eftim'im' diyen din adamı kimdir?[cite: 104]", answer: "Papa Eftim" },
+  { question: "Lozan Antlaşması'nda azınlıkları ilgilendiren maddelerin yer aldığı kısım kaçıncı maddeler arasındadır?[cite: 105]", answer: "37 - 45. maddeler" },
+  { question: "Cumhuriyet döneminin 1863 nizamnamesine göre seçilen ilk patriği kimdir?[cite: 106]", answer: "Mesrob Naroyan" },
+  { question: "Heybeliada Ruhban Okulu hangi yılda kapatılmıştır?[cite: 107]", answer: "1971" }
 ];
 
 let currentPuzzleItem = null;
 let puzzleScore = 0;
 
 function startMatchingGameModal() {
-  if (!customIktisatPuzzlePool || customIktisatPuzzlePool.length === 0) return;
+  if (!customPuzzlePool || customPuzzlePool.length === 0) return;
   
-  // Rastgele bir bulmaca sorusu seçelim
-  const randomIndex = Math.floor(Math.random() * customIktisatPuzzlePool.length);
-  currentPuzzleItem = customIktisatPuzzlePool[randomIndex];
+  const randomIndex = Math.floor(Math.random() * customPuzzlePool.length);
+  currentPuzzleItem = customPuzzlePool[randomIndex];
 
   renderPuzzleUI();
 
@@ -768,14 +760,13 @@ function startMatchingGameModal() {
 }
 
 function renderPuzzleUI() {
-  document.getElementById("popupModalHeaderTitle").innerText = "🧩 Osmanlı İktisat Tarihi - Kavram Bulmacası";
+  document.getElementById("popupModalHeaderTitle").innerText = "🧩 Osmanlı Tarihi - Kavram Bulmacası";
   document.getElementById("popupCourseTitle").innerText = "Özet Klavuzu & Ders Notları Bulmacası";
   document.getElementById("popupSectionBadge").innerText = `Skor: ${puzzleScore}`;
   document.getElementById("finish10QuizEarlyBtn")?.classList.add("hidden");
   document.getElementById("popupNextBtn").classList.add("hidden");
   document.getElementById("popupFeedbackBox").classList.add("hidden");
 
-  // Cevabı harflerine ayıralım veya boşluk doldurma kutusu yapalım
   const ans = currentPuzzleItem.answer;
   let maskedAnswer = "";
   for (let i = 0; i < ans.length; i++) {
@@ -795,11 +786,9 @@ function renderPuzzleUI() {
     </div>
   `;
 
-  // Şıklar veya tahmin kutusu oluşturalım
-  // Doğru cevabı ve havuzdan rastgele 3 yanlış cevabı şık olarak sunalım
   let optionsList = [ans];
   while (optionsList.length < 4) {
-    const randomWrong = customIktisatPuzzlePool[Math.floor(Math.random() * customIktisatPuzzlePool.length)].answer;
+    const randomWrong = customPuzzlePool[Math.floor(Math.random() * customPuzzlePool.length)].answer;
     if (!optionsList.includes(randomWrong)) {
       optionsList.push(randomWrong);
     }
@@ -808,7 +797,7 @@ function renderPuzzleUI() {
 
   let html = `<div class="space-y-2 mt-2">`;
   optionsList.forEach((opt, idx) => {
-    const optKey = String.fromCharCode(65 + idx); // A, B, C, D
+    const optKey = String.fromCharCode(65 + idx);
     html += `
       <button onclick="checkPuzzleAnswer('${opt.replace(/'/g, "\\'")}', '${ans.replace(/'/g, "\\'")}')" class="option-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-blue-500 flex items-center gap-3 text-xs sm:text-sm font-semibold text-slate-800 transition">
         <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">${optKey}</span>
@@ -835,18 +824,15 @@ function checkPuzzleAnswer(selectedOpt, correctOpt) {
     : `✗ <strong>Yanlış Tahmin.</strong> Doğru kavram olmalıydı: <strong>${correctOpt}</strong>`;
   feedbackBox.classList.remove("hidden");
 
-  // Maskeli alanı açıp tam cevabı gösterelim
   document.getElementById("puzzleMaskDisplay").innerText = correctOpt;
   document.getElementById("puzzleMaskDisplay").className = "text-lg font-mono font-extrabold text-emerald-700 tracking-wider";
 
-  // Butonları devre dışı bırakıp "Sonraki Bulmaca" butonu ekleyelim
   document.getElementById("popupOptionsList").innerHTML = `
     <button onclick="startMatchingGameModal()" class="w-full py-3 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs transition shadow-sm">
       ➡️ Sonraki Bulmacaya Geç
     </button>
   `;
 }
-
 function selectLeftMatchItem(id) {
   selectedTermCard = matchingGamePool.find(item => item.id === id);
   renderMatchingGameUI();
