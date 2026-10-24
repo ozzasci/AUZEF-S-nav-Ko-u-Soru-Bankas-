@@ -648,8 +648,9 @@ function saveJsonChanges() {
   }
 }
 
-// Osmanlı İktisat Tarihi PDF Notlarından Derlenen Zengin Bulmaca Havuzu
-const customIktisatPuzzlePool = [
+// Tüm Osmanlı Tarihi PDF Notlarından (İktisat, Teşkilat, Kültür, Medeniyet ve Diplomasi) Eksiksiz Derlenen Tam Bulmaca Havuzu
+const customPuzzlePool = [
+  // İktisat Tarihi
   { question: "Modern kapitalizmin bir ürünü olarak ortaya çıkan, bireyin kendi faydasını artıracak şekilde karar alması düşüncesini ve tümdengelimci yöntemi ön plana çıkaran bilim dalıdır.", answer: "Kapitalist İktisat Bilimi" },
   { question: "İktisat tarihinin doğuşunda öncü olan ve Ricardo geleneğinin mutlakçılığına karşı iktisadî izafiyeti (relativism) savunan ekoldür.", answer: "Alman Tarihçi Okulu" },
   { question: "Osmanlı iktisat politikasının üç temel ilkesinden biri olan, iktisadî faaliyete tüketici açısından bakan ve temel hedefi piyasada mal arzını bol, kaliteli ve ucuz tutmak olan ilkedir.", answer: "İaşe" },
@@ -670,7 +671,14 @@ const customIktisatPuzzlePool = [
   { question: "Osmanlı para tarihinde altın ve gümüş paranın bir arada basıldığı devre verilen adıdır.", answer: "Bimetalizm" },
   { question: "Polonya menşeli olan ve Osmanlıların kuruştan daha fazla bastıkları sikke birimidir.", answer: "Zolota" },
   { question: "Kitap ehli gayr-i müslimlerden, devlet tarafından korunmaları ve askerlikten muaf tutulmaları karşılığında alınan baş vergisidir.", answer: "Cizye" },
- { question: "Osmanlı padişahlarının gelirlerinin toplandığı, Enderun Hazinesi'nin bünyesinde yer alan hazinenin adı nedir?", answer: "Ceyb-i Hümâyûn" },
+  { question: "Dîvânın kararı ve padişahın emriyle olağanüstü hallerde aynî, nakdî veya hizmet olarak toplanan örfî vergilerin genel adıdır.", answer: "Avârız" },
+
+  // Teşkilat ve Kültür Tarihi / Medeniyet
+  { question: "Osmanlı devletinde ilk maliye teşkilatını kuran padişah kimdir?", answer: "I. Murad" },
+  { question: "Osmanlı Devleti'nde ilmiye teşkilatının reisi olan, protokolde veziriazamın bile üstünde yer alan ve ilk ataması II. Murad zamanında yapılan makam hangisidir?", answer: "Şeyhülislâmlık" },
+  { question: "Fâtih Sultan Mehmed döneminde İstanbul'da kurulan 8 medresenin genel adı nedir?", answer: "Sahn-ı Seman" },
+  { question: "Osmanlı donanmasının ilk komutanı ve Karamürsel'de ilk tersaneyi kuran denizci kimdir?", answer: "Karamürsel Alp" },
+  { question: "Osmanlı siyasi, adli, mali, askeri alanlarda alınan kararların görüşülüp karara bağlandığı yürütme ve danışma organı olan divanın padişah haricinde başkanlık eden mutlak vekili kimdir?", answer: "Sadrazam" },
   { question: "Padişahların tesis ettiği büyük külliyelere arazi, han, hamam ve dükkân gibi zengin kaynaklar tahsis etmesi sistemine ne ad verilir?", answer: "Evkaf-ı Selâtin" },
   { question: "Topkapı Sarayı'nda, tamamıyla Avrupa üslûbunda inşa edilen son binanın adı nedir?", answer: "Mecidiye Köşkü" },
   { question: "Valide sultanların has türünden toprak gelirlerine verilen ad nedir?", answer: "Paşmaklık" },
@@ -694,8 +702,33 @@ const customIktisatPuzzlePool = [
   { question: "Şahkulu'nun talebesi olan, 'Muhibbi Dîvânı'nı tezhip eden ve bahçe çiçeklerini tezhibe dahil eden XVI. yüzyıl müzehhibi kimdir?", answer: "Kara Memi" },
   { question: "Mimar Sinan'ın II. Selim için Edirne'de inşa ettiği, mimarlık dehasının doruk noktası olan abidevi eserin adı nedir?", answer: "Selimiye Camii" },
   { question: "Süleyman Çelebi'nin 1409'da Bursa'da yazdığı, tüm zamanların en fazla şöhret kazanan dinî Türk edebiyatı mahsulü nedir?", answer: "Vesîletü'n-Necat (Mevlid)" },
-  { question: "II. Mahmud tarafından 1828'de kapatılıp yerine Napolyon'un emekli bando subayına kurdurulan Batı kopyası saray bando okulunun adı nedir?", answer: "Mızıka-i Hümayun" }
-  { question: "Dîvânın kararı ve padişahın emriyle olağanüstü hallerde aynî, nakdî veya hizmet olarak toplanan örfî vergilerin genel adıdır.", answer: "Avârız" }
+  { question: "II. Mahmud tarafından 1828'de kapatılıp yerine Napolyon'un emekli bando subayına kurdurulan Batı kopyası saray bando okulunun adı nedir?", answer: "Mızıka-i Hümayun" },
+
+  // Diplomasi Tarihi
+  { question: "Orhun Abideleri'nde 'elçi' kelimesinin karşılığı olarak kullanılan terim nedir?", answer: "Yalabaç" },
+  { question: "Hititler ve eski Mısırlılar arasında imzalanan, diplomasi tarihinin bilinen ilk yazılı barış antlaşması hangisidir?", answer: "Kadeş Antlaşması" },
+  { question: "Antik Grek'te bir site devletine gelen tüccarların ticari haklarının korunması amacıyla oluşturulan, konsolosluğun ilk örneği olan kurum hangisidir?", answer: "Proksenos" },
+  { question: "Hz. Muhammed'in 628 yılında Mekke'deki Kureyş yönetimiyle bizzat müzakere yaparak imzaladığı, İslâm tarihinin ilk diplomatik metni nedir?", answer: "Hudeybiye Antlaşması" },
+  { question: "İtalyan şehir devletleri zamanında Filistin, Suriye, Mısır ve İstanbul'da ticari faaliyet gösteren konsoloslara verilen unvan nedir?", answer: "Bailo (Balyos)" },
+  { question: "Avrupa'da sürekli diplomasinin temellerinin atıldığı ve ilk defa çok taraflı diplomasinin uygulandığı kongre süreci hangisidir?", answer: "Vestfalya Kongresi" },
+  { question: "Siyasetin tek hedefinin güç ve yetki edinmek olduğunu savunan ve 'Prens' adlı eseri yazan 15. yüzyıl diplomasi teorisyeni kimdir?", answer: "Niccolo Machiavelli" },
+  { question: "Osmanlı diplomasi tarihinde bir dönüm noktası olan, hukuki eşitliğe dayalı kaleme alınan ilk Osmanlı antlaşması hangisidir?", answer: "Zitvatorok Antlaşması" },
+  { question: "Osmanlı Devleti'nde yabancı devletlerle yapılan barış şartlarını ve ticari ayrıcalıkları içeren, mütekabiliyet esası olmayan belgeye ne denir?", answer: "Ahidnâme" },
+  { question: "III. Selim döneminde Londra'ya tayin edilen, büyükelçi rütbeli ilk daimi Osmanlı elçisi kimdir?", answer: "Yusuf Agâh Efendi" },
+  { question: "Osmanlı'nın 1838'de İngiltere ile imzaladığı, yed-i vâhid (tekel) sisteminin ve ihraç yasaklarının kaldırıldığı antlaşma hangisidir?", answer: "Balta Limanı Muahedesi" },
+  { question: "Osmanlı'da tercüman ihtiyacının giderilmesi için Sultan II. Mahmud'un emri ile Babıâli içerisinde açılan kurumun adı nedir?", answer: "Tercüme Odası" },
+  { question: "Osmanlı'da dışişleri faaliyetlerini yürütmek üzere Sultan II. Mahmud'un emriyle 1836'da oluşturulan kurum hangisidir?", answer: "Umur-ı Hariciye Nezareti" },
+  { question: "Osmanlı'nın Kırım Savaşı sonrasında imzaladığı, Karadeniz'in tarafsızlaştırıldığı ve Avrupa devletler sisteminin eşit üyesi kabul edildiği antlaşma hangisidir?", answer: "Paris Antlaşması" },
+  { question: "Sultan II. Abdülhamid döneminde, dış borçların ödenmesi için Avrupalı alacaklılar ile yapılan finans antlaşmasının adı nedir?", answer: "Muharrem Kararnamesi" },
+  { question: "93 Harbi sonrasında Osmanlı tarihinin en ağır şartlarını içeren, Büyük Bulgaristan Prensliği'nin kurulmasını öngören imzalanan antlaşma hangisidir?", answer: "Ayastefanos Antlaşması" },
+  { question: "Osmanlı'nın Balkan Savaşları sonrasında Edirne'yi kaybedip Midye-Enez hattının batısındaki topraklarından çekilmeyi kabul ettiği antlaşma hangisidir?", answer: "Londra Antlaşması" },
+  { question: "Osmanlı Devleti'nin I. Dünya Savaşı'na fiilen girmesine yol açan, İngilizlerden kaçarak Boğazlar'a gelen Alman savaş gemilerinin adları nelerdir?", answer: "Goeben ve Breslau (Yavuz ve Midilli)" },
+  { question: "Osmanlı Devleti'nin I. Dünya Savaşı sonunda imzaladığı, müttefiklere istedikleri mevkileri işgal hakkı veren mütareke hangisidir?", answer: "Mondros Mütarekesi" },
+  { question: "Yurtdışına yollanan Osmanlı elçilerinin gözlemlerini ve diplomatik faaliyetlerini bildirmek amacıyla kaleme aldıkları raporlara ne denir?", answer: "Sefaretname" },
+  { question: "Fransa'nın Mısır'ı işgaliyle Akdeniz'de dengelerin değişmesi ve Osmanlı'nın paylaşılması projelerine verilen genel ad nedir?", answer: "Doğu Meselesi (Eastern Question)" },
+  { question: "Ebubekir Ratip Efendi'nin kaleme aldığı, Avrupa'nın askeri, idari ve mali teşkilatı hakkında incelemeye dayanan geniş rapora ne ad verilir?", answer: "Büyük Layiha" },
+  { question: "İngiltere Dışişleri Bakanı Arthur James Balfour'un mektubuyla Filistin'de Yahudilere ait bir yurt oluşturulması çabasını gösteren belge nedir?", answer: "Balfour Deklerasyonu" },
+  { question: "Doğu Sorunu'nun kesin çözümü adına Osmanlı'nın yok edilmesi anlamını taşıyan, imzalanan en ağır içerikli antlaşma hangisidir?", answer: "Sevr Barış Antlaşması" }
 ];
 
 let currentPuzzleItem = null;
