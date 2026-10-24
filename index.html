@@ -1774,6 +1774,9 @@ function installPWAApp() {
     alert("Tarayıcınızın menüsünden 'Ana Ekrana Ekle' seçeneğini kullanabilirsiniz.");
   }
 }
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW hata:', err));
+}
 </script>
 </body>
 </html>
