@@ -1,11 +1,11 @@
 {
   "name": "AUZEF Sınav Koçu & Soru Bankası",
   "short_name": "AUZEF Sınav",
+  "description": "AUZEF öğrencileri için ünite ve vize soruları içeren, çevrimdışı çalışabilen ve akıllı koçluk bildirimleri sunan interaktif sınav platformu.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "./icon-192.png",
