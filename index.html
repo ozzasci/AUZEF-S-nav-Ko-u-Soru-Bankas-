@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AUZEF Tarih Lisans - Çok Dersli İnteraktif Sınav Platformu</title>
+  <link rel="manifest" href="./manifest.json">  
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #0f172a; }
+    .option-btn { transition: all 0.16s ease; }
+    .option-btn:hover:not(:disabled) { border-color: #3b82f6; background-color: #f8fafc; transform: translateY(-1px); }
+    .option-correct { border-color: #16a34a !important; background-color: #dcfce7 !important; color: #14532d !important; font-weight: 600; }
+    .option-wrong { border-color: #dc2626 !important; background-color: #fee2e2 !important; color: #7f1d1d !important; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Üst Başlık -->
+  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2.5">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500 flex items-center justify-center font-extrabold text-slate-900 text-base sm:text-lg shadow shrink-0">
+          AU
+        </div>
+        <div>
+          <h1 class="text-sm sm:text-lg font-bold tracking-tight leading-snug">AUZEF Sınav Koçu & Soru Bankası</h1>
+          <p class="text-[11px] sm:text-xs text-slate-300" id="headerSubText">Tüm Soru Havuzu Destekli Platform</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+        <button onclick="openAddCourseModal()" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-[11px] sm:text-xs font-semibold text-white transition flex items-center gap-1 shadow-sm" title="JSON Ekle (Silinmeden Eklenir)">
+          <span>+ Soru/JSON Ekle</span>
+        </button>
+        <button id="installAppBtn" onclick="installPWAApp()" class="hidden px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-[11px] sm:text-xs font-bold text-white transition flex items-center gap-1 shadow-sm">
+          <span>📲 Yükle</span>
+        </button>
+        <button onclick="openReminderModal()" id="reminderHeaderBtn" class="px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] sm:text-xs font-extrabold transition flex items-center gap-1 shadow-sm">
+          <span>🔔 Hatırlat</span>
+          <span id="reminderTimerBadge" class="hidden px-1 py-0.5 rounded bg-slate-900 text-amber-400 font-mono text-[9px]">00:00</span>
+        </button>
+        <button onclick="openJsonModal()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] sm:text-xs font-semibold border border-slate-700 transition">
+          JSON Verisi
+        </button>
+        <button onclick="resetProgress()" class="px-2.5 py-1.5 rounded-lg bg-rose-600/90 hover:bg-rose-600 text-[11px] sm:text-xs font-semibold transition" title="Ekranı Temizle">
+          Ekranı Temizle
+        </button>
+        <button onclick="openStatsModal()" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-[11px] sm:text-xs font-bold text-white transition shadow-sm">
+          📊 İstatistik
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Ders Seçim Sekmeleri -->
+  <section class="bg-slate-800 text-slate-200 border-b border-slate-700">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex items-center gap-2 overflow-x-auto custom-scroll" id="courseTabs"></div>
+  </section>
+
+  <!-- Kontrol ve Filtre Çubuğu -->
+  <section class="bg-white border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
+      <div class="lg:col-span-3">
+        <label class="block text-[10px] sm:text-[11px] font-bold uppercase text-slate-400 mb-1">Ünite / Bölüm Filtresi</label>
+        <select id="sectionFilter" onchange="applyFilters()" class="w-full rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"></select>
+      </div>
+
+      <div class="lg:col-span-3">
+        <label class="block text-[10px] sm:text-[11px] font-bold uppercase text-slate-400 mb-1">Soru veya Kavram Ara</label>
+        <input id="searchInput" type="text" oninput="applyFilters()" placeholder="Örn: Nizamname, Mütareke..." class="w-full rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600" />
+      </div>
+
+      <div class="lg:col-span-6 flex flex-wrap items-end gap-2 pt-1 lg:pt-0">
+        <div class="w-full sm:w-auto flex-1 min-w-[140px]">
+          <label class="block text-[10px] sm:text-[11px] font-bold uppercase text-slate-400 mb-1">Çözüm Modu</label>
+          <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <button id="modeSingleBtn" onclick="setViewMode('single')" class="py-1.5 text-xs font-bold rounded-md bg-white shadow-sm text-blue-900">Tek Soru</button>
+            <button id="modeListBtn" onclick="setViewMode('list')" class="py-1.5 text-xs font-bold rounded-md text-slate-600">Liste Modu</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 flex-wrap w-full sm:w-auto">
+          <!-- Soru Sayısı Seçimi -->
+          <select id="examQuestionCountSelect" class="rounded-lg border border-slate-300 bg-slate-50 px-2 py-2 text-xs font-semibold text-slate-800 focus:outline-none">
+            <option value="10">10 Soru</option>
+            <option value="20" selected>20 Soru</option>
+            <option value="50">50 Soru</option>
+            <option value="ALL">Tüm Sorular</option>
+          </select>
+          <button onclick="startRandomExam()" class="px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition shadow-sm" title="Seçilen Sayıda Test Başlat">
+            🎲 Test Başlat
+          </button>
+          <button onclick="startExamSimulation()" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-purple-700 text-white hover:bg-purple-600 shadow-sm flex items-center gap-1.5" title="Süreli Sınav Simülasyonu">
+            <span>⏱️ Sınav Modu</span>
+          </button>
+          <button onclick="selectWeakCourse()" class="px-3 py-2 rounded-lg transition bg-rose-900 text-rose-100 hover:bg-rose-800 shadow-sm font-bold text-xs flex items-center gap-1" title="Zayıf / Yanlış Sorularım">
+            <span>📌 Zayıf Sorular</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canlı İstatistik Çubuğu -->
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+        <span class="font-semibold text-slate-600">Aktif: <strong id="statTotal" class="text-slate-900">0</strong></span>
+        <span class="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Doğru: <strong id="statCorrect">0</strong></span>
+        <span class="font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">Yanlış: <strong id="statWrong">0</strong></span>
+        <span class="font-semibold text-slate-600">Boş: <strong id="statEmpty">0</strong></span>
+        <button onclick="filterWrongOnly()" id="wrongFilterBtn" class="text-[11px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800 hover:bg-rose-200 transition hidden">
+          Sadece Yanlışlar (<span id="wrongCountBadge">0</span>)
+        </button>
+      </div>
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <span class="font-bold text-blue-900">Net: <strong id="statPercent">0 Net</strong></span>
+        <span class="font-extrabold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Puan: <strong id="statScore">0</strong>/100</span>
+        <button onclick="finishCurrentTestAnytime()" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] shadow-sm transition flex items-center gap-1">
+          <span>🏁 Testi / Sınavı Bitir</span>
+        </button>
+      </div>
+    </div>
+    <div class="w-full bg-slate-200 h-1.5">
+      <div id="progressBar" class="bg-blue-600 h-1.5 transition-all duration-300" style="width: 0%"></div>
+    </div>
+  </section>
+
+  <!-- Ana İçerik Alanı -->
+  <main class="max-w-7xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+    <div class="lg:col-span-8 xl:col-span-9">
+      <!-- Tek Soru Görünümü -->
+      <div id="singleViewContainer" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-4 sm:px-6 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="qIndexBadge" class="px-3 py-1 rounded-full bg-blue-900 text-white font-bold text-xs">Soru 1</span>
+            <span id="qSectionBadge" class="px-2.5 py-1 rounded-md bg-slate-200 text-slate-700 font-semibold text-xs">Bölüm</span>
+            <span id="examModeIndicator" class="hidden px-2.5 py-1 rounded-md bg-purple-100 text-purple-800 font-extrabold text-[11px] border border-purple-300">⏱️ Sınav Modu Aktif</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="clearSingleQuestionAnswer()" id="clearSingleAnsBtn" class="hidden text-[11px] font-semibold text-slate-500 hover:text-rose-600 underline">Seçimi Temizle</button>
+            <span id="qOriginalNo" class="text-xs text-slate-400 font-medium"></span>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-6">
+          <p id="qText" class="text-sm sm:text-base font-semibold text-slate-800 leading-relaxed mb-5"></p>
+          <div id="qOptions" class="space-y-2.5"></div>
+          <div id="qFeedback" class="hidden mt-4 p-3.5 rounded-xl border text-xs sm:text-sm leading-relaxed"></div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-2">
+          <button id="prevBtn" onclick="navigateQuestion(-1)" class="px-3.5 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs sm:text-sm disabled:opacity-40 transition">
+            ← Önceki
+          </button>
+          
+          <div class="flex items-center gap-2">
+            <button onclick="finishCurrentTestAnytime()" class="px-3 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition">
+              🏁 Bitir & Karne
+            </button>
+            <span id="footerCounter" class="text-xs font-bold text-slate-500">1 / 1</span>
+          </div>
+
+          <button id="nextBtn" onclick="navigateQuestion(1)" class="px-3.5 py-2 rounded-lg bg-blue-900 hover:bg-blue-800 text-white font-semibold text-xs sm:text-sm disabled:opacity-40 transition">
+            Sonraki →
+          </button>
+        </div>
+      </div>
+
+      <!-- Liste Görünümü -->
+      <div id="listViewContainer" class="hidden space-y-4"></div>
+    </div>
+
+    <!-- Sağ: Soru Navigasyon Paleti -->
+    <aside class="lg:col-span-4 xl:col-span-3">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sticky top-16 sm:top-20">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Soru Gezgini</h2>
+          <span class="text-[11px] text-slate-400">Numaraya tıkla</span>
+        </div>
+        <div id="questionGrid" class="grid grid-cols-7 sm:grid-cols-10 lg:grid-cols-5 gap-1.5 max-h-[50vh] lg:max-h-[60vh] overflow-y-auto custom-scroll pr-1"></div>
+        <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-3 gap-2 text-[11px] text-slate-600">
+          <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Doğru</div>
+          <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-rose-500 inline-block"></span> Yanlış</div>
+          <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-slate-200 inline-block"></span> Boş</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Modaller -->
+  <div id="jsonModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-sm sm:text-base">JSON Veri Yönetimi</h3>
+          <p class="text-xs text-slate-300">Tüm derslerin soru havuzunu inceleyebilir veya ders silebilirsiniz.</p>
+        </div>
+        <button onclick="closeJsonModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="p-4 bg-slate-100 border-b border-slate-200 flex flex-wrap gap-2 justify-between items-center text-xs">
+        <div class="flex flex-wrap gap-2">
+          <button onclick="copyJsonToClipboard()" class="px-3 py-1.5 rounded-lg bg-blue-900 hover:bg-blue-800 text-white font-semibold">JSON Kopyala</button>
+          <button onclick="downloadJsonFile()" class="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-semibold">JSON İndir</button>
+          <button onclick="deleteActiveCourse()" class="px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-600 text-white font-semibold">🗑️ Aktif Dersi Sil</button>
+        </div>
+        <span id="copyStatus" class="font-bold text-emerald-700"></span>
+      </div>
+
+      <div class="p-4 flex-1 flex flex-col overflow-hidden">
+        <textarea id="editableJsonOutput" class="w-full flex-1 p-3 text-xs font-mono text-slate-800 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none custom-scroll"></textarea>
+      </div>
+
+      <div class="px-6 py-3 bg-slate-100 border-t border-slate-200 flex justify-end gap-2 text-xs">
+        <button onclick="closeJsonModal()" class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 font-semibold">İptal</button>
+        <button onclick="saveJsonChanges()" class="px-4 py-2 rounded-lg bg-blue-900 hover:bg-blue-800 text-white font-bold">💾 Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addCourseModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-sm sm:text-base">Soru Kitapçığı Yükle (Silinmeden Birleştirilir)</h3>
+          <p class="text-[11px] sm:text-xs text-slate-300">Yeni ünite veya vize dosyası yüklediğinde eski soruların silinmez, havuzuna eklenir.</p>
+        </div>
+        <button onclick="closeAddCourseModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      </div>
+      
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs">
+        <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200 space-y-2">
+          <label class="block font-bold text-blue-950">📁 1. Yöntem: Cihazdan / Google Drive Uygulamasından Dosya Seç (.json)</label>
+          <input type="file" id="jsonFileInput" accept=".json,application/json,text/plain" multiple onchange="handleJsonFileSelect(event)" class="block w-full text-xs text-slate-700 file:mr-3 file:py-2 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer" />
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 space-y-2">
+          <label class="block font-bold text-amber-950">🔗 2. Yöntem: Google Drive Ham Linki (URL)</label>
+          <div class="flex gap-2">
+            <input type="url" id="jsonUrlInput" placeholder="https://.../sorular.json" class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-amber-500" />
+            <button onclick="fetchJsonFromUrl()" class="px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shrink-0 transition">Drive'dan Çek</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">📋 3. Yöntem: Veya JSON Metnini Buraya Yapıştırın:</label>
+          <textarea id="importJsonInput" rows="5" class="w-full rounded-xl border border-slate-300 p-3 font-mono text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder='[ { "ders_adi": "...", "unite_no": 1, "soru_metni": "...", ... } ] veya standart format'></textarea>
+        </div>
+        <div id="importStatus" class="font-bold text-xs"></div>
+      </div>
+
+      <div class="px-5 py-3 bg-slate-100 border-t border-slate-200 flex justify-end gap-2">
+        <button onclick="closeAddCourseModal()" class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 font-semibold text-xs">İptal</button>
+        <button onclick="importCustomCourse()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs">Havuza Ekle ve Birleştir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hatırlatıcı ve Koçluk Modalı -->
+  <div id="reminderSettingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-200">
+      <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🔔</span>
+          <div>
+            <h3 class="font-bold text-sm sm:text-base">Akıllı Soru Hatırlatıcı & Koç</h3>
+            <p class="text-[11px] text-slate-300">Belirli saatte 10 soruluk deneme bildirimi</p>
+          </div>
+        </div>
+        <button onclick="closeReminderModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="p-5 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Hatırlatıcı Sıklığı</label>
+          <select id="reminderIntervalSelect" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 font-semibold text-slate-800">
+            <option value="60">Her 1 Dakikada Bir (Test)</option>
+            <option value="300" selected>Her 5 Dakikada Bir</option>
+            <option value="900">Her 15 Dakikada Bir</option>
+            <option value="1800">Her 30 Dakikada Bir</option>
+            <option value="3600">Her 1 Saatte Bir</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">⏰ Belirli Saatte Günlük Deneme Saati</label>
+          <div class="flex items-center gap-2">
+            <input type="time" id="targetDailyTimeInput" value="20:00" class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 font-semibold text-slate-800" />
+            <span class="text-[11px] text-slate-500">Bu saatte "10 soru hazırladım, çözelim mi?" bildirimi gelir.</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">🎵 Bildirim Ses Efekti</label>
+          <select id="customSoundSelect" onchange="toggleCustomAudioUpload()" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 font-semibold text-slate-800 mb-2">
+            <option value="bell">Çan Sesi (Klasik)</option>
+            <option value="chime">Özel Melodi (Yumuşak Çınlama)</option>
+            <option value="digital">Dijital Alarm</option>
+            <option value="custom_file">📁 Cihazımdan Ses Seç (.mp3)</option>
+            <option value="none">Sadece Sessiz / Titreşim</option>
+          </select>
+          <input type="file" id="customAudioFileInput" accept="audio/*" onchange="handleCustomAudioUpload(event)" class="hidden block w-full text-[11px] text-slate-700 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-amber-500 file:text-slate-950" />
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="reminderVibrateCheck" checked class="w-4 h-4 rounded text-blue-600" />
+          <label for="reminderVibrateCheck" class="font-semibold text-slate-700">Bildirimde titreşim uygula</label>
+        </div>
+
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div>
+            <div class="font-bold text-slate-800">Masaüstü / Telefon Bildirimi</div>
+            <div class="text-[10px] text-slate-500">Sekme arkadayken bildirim gönderir</div>
+          </div>
+          <button onclick="requestSystemNotificationPermission()" id="notifPermBtn" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 font-bold text-[11px]">İzin Ver</button>
+        </div>
+
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between">
+          <div>
+            <div class="font-extrabold text-amber-900">🔥 Günlük Çalışma Serisi</div>
+            <div class="text-[11px] text-amber-700">Sorular çözüldükçe serin artar</div>
+          </div>
+          <div class="text-sm font-extrabold text-amber-900 bg-white px-3 py-1 rounded-lg border border-amber-300 shadow-sm" id="streakCountDisplay">0 Gün</div>
+        </div>
+      </div>
+
+      <div class="px-5 py-3 bg-slate-100 border-t border-slate-200 flex justify-between items-center">
+        <button onclick="stopReminderTimer()" id="stopReminderBtn" class="px-3.5 py-2 rounded-lg bg-rose-600 text-white font-bold text-xs hidden">Durdur</button>
+        <div class="flex gap-2 ml-auto">
+          <button onclick="trigger10QuestionQuizModal()" class="px-3 py-2 rounded-lg bg-purple-100 text-purple-900 font-bold text-xs" title="10 Soruluk Testi Hemen Başlat">10 Soru Başlat</button>
+          <button onclick="startReminderTimer()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs">Koçu Başlat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 Soruluk Mini Deneme Modalı -->
+  <div id="popupQuestionModal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border-2 border-amber-400 flex flex-col max-h-[90vh]">
+      <div class="px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🎯</span>
+          <div>
+            <h4 class="font-extrabold text-xs uppercase tracking-wider" id="popupModalHeaderTitle">Sınav Koçu 10 Soruluk Deneme</h4>
+            <p id="popupCourseTitle" class="text-[11px] font-semibold text-slate-900"></p>
+          </div>
+        </div>
+        <span class="px-2 py-0.5 rounded-full bg-slate-900 text-amber-400 font-bold text-[10px]" id="popupSectionBadge"></span>
+      </div>
+
+      <div class="p-4 sm:p-5 overflow-y-auto flex-1">
+        <p id="popupQuestionText" class="font-bold text-slate-800 text-xs sm:text-sm leading-relaxed mb-3"></p>
+        <div id="popupOptionsList" class="space-y-2"></div>
+        <div id="popupFeedbackBox" class="hidden mt-3 p-2.5 rounded-xl text-xs font-semibold"></div>
+      </div>
+
+      <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex gap-1.5">
+          <button onclick="snoozeReminder()" class="px-2.5 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold">⏰ 5 Dk Ertele</button>
+          <button id="finish10QuizEarlyBtn" onclick="showQuizCompletionReport()" class="px-2.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold">🏁 Şimdi Bitir</button>
+        </div>
+        <div class="flex gap-1.5">
+          <button id="popupNextBtn" onclick="nextPopupQuestion()" class="hidden px-3 py-1.5 rounded-lg bg-blue-900 text-white font-bold">Sonraki →</button>
+          <button onclick="closePopupQuestion()" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold">Kapat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kalıcı İstatistik Modalı -->
+  <div id="statsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 text-xs text-slate-800 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b pb-2.5">
+        <div>
+          <h3 class="font-extrabold text-sm sm:text-base text-slate-900">📊 Kalıcı Çalışma İstatistiklerim</h3>
+          <p class="text-[11px] text-slate-500">Ekranı temizleseniz bile buradaki geçmiş verileriniz silinmez.</p>
+        </div>
+        <button onclick="closeStatsModal()" class="text-slate-400 hover:text-slate-900 text-xl font-bold">&times;</button>
+      </div>
+      <div id="statsContent" class="space-y-3 font-medium overflow-y-auto flex-1 pr-1 custom-scroll"></div>
+      <div class="flex justify-between items-center pt-2 border-t">
+        <button onclick="hardResetLifetimeStats()" class="text-[11px] text-rose-600 hover:underline font-semibold">Tüm Geçmiş İstatistikleri Tamamen Sil</button>
+        <button onclick="closeStatsModal()" class="px-4 py-2 rounded-lg bg-slate-900 text-white font-bold text-xs">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sınav ve Test Sonuç Karne Modalı -->
+  <div id="examResultModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs sm:text-sm text-slate-800">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-extrabold text-base sm:text-lg text-slate-900" id="examResultModalTitle">🏁 Test / Sınav Karnesi</h3>
+        <button onclick="closeExamResultModal()" class="text-slate-400 hover:text-slate-900 text-xl font-bold">&times;</button>
+      </div>
+      <div id="examResultContent" class="space-y-3 font-medium"></div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeExamResultModalAndClear()" class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs">İşaretleri Temizle ve Yeni Çöz</button>
+        <button onclick="closeExamResultModal()" class="px-4 py-2 rounded-lg bg-slate-900 text-white font-bold text-xs">İncelemeye Dön</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-slate-900 text-slate-400 py-3.5 mt-auto border-t border-slate-800 text-center text-xs">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>
+        <p class="font-semibold text-slate-300">OZZ - 2026 Tüm Hakları Saklıdır.</p>
+        <p class="text-[10px] text-slate-500">AUZEF İnteraktif Vize Hazırlık ve Soru Bankası Platformu</p>
+      </div>
+      <div>
+        <a href="https://wa.me/905309082276" target="_blank" class="text-amber-400 hover:underline font-bold flex items-center gap-1">
+          <span>💬 WhatsApp Destek: 0530 908 22 76</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+<script>
+const defaultCourses = {
+  gayrimuslim: {
+    ders_kodu: "gayrimuslim",
+    ders_adi: "20. Yüzyıl Türkiye'sinde Gayrimüslimler ve Kurumları",
+    kisa_ad: "Gayrimüslimler",
+    sorular: [
+      { id: "gay_pdf_1", no: 1, bolum: "3. Ünite", soru: "Tanzimat Fermanı'nın ilan edilmesindeki ana motivasyon nedir ve hangi yıl bu belge resmen duyurulmuştur?", siklar: { A: "Osmanlı Devleti'nin ekonomik darboğazdan kurtulma çabaları çerçevesinde, 1835 yılında ilan edilmiştir.", B: "Osmanlı topraklarının bölünmesini önlemek amacıyla, 1839 yılında ilan edilmiştir.", C: "Avrupalı devletlerle ittifak kurmayı kolaylaştırmak amacıyla, 1844 yılında duyurulmuştur.", D: "Vergi toplama sisteminde köklü değişiklikler yapmak için, 1856 yılında ilan edilmiştir.", E: "Toplumun refah düzeyini artırmak için, 1864 yılında duyurulmuştur." }, cevap: "B" }
+    ]
+  }
+};
+
+let courses = { ...defaultCourses };
+let activeCourseKey = "gayrimuslim";
+let activePool = [];
+let currentIndex = 0;
+
+let sessionAnswers = {};
+let lifetimeStats = {
+  totalSolved: 0,
+  totalCorrect: 0,
+  totalWrong: 0,
+  wrongQuestionIds: {},
+  examHistory: []
+};
+
+let viewMode = "single";
+let isExamMode = false;
+let examTimerInterval = null;
+let examSecondsLeft = 0;
+
+let reminderIntervalSec = 300;
+let remainingSec = 0;
+let reminderTimerId = null;
+let customUploadedAudioData = null;
+
+let is10QuestionQuizMode = false;
+let quizQuestionsList = [];
+let quizCurrentIdx = 0;
+let quizCorrectCount = 0;
+let quizWrongCount = 0;
+
+function loadSavedState() {
+  try {
+    const savedSession = localStorage.getItem("auzef_session_answers_v7");
+    if (savedSession) sessionAnswers = JSON.parse(savedSession);
+
+    const savedLifetime = localStorage.getItem("auzef_lifetime_stats_v7");
+    if (savedLifetime) {
+      lifetimeStats = { ...lifetimeStats, ...JSON.parse(savedLifetime) };
+    }
+
+    const savedCustomCourses = localStorage.getItem("auzef_custom_courses_v7");
+    if (savedCustomCourses) {
+      const parsed = JSON.parse(savedCustomCourses);
+      courses = { ...defaultCourses, ...parsed };
+    }
+  } catch (e) {}
+}
+
+function saveSessionState() {
+  try {
+    localStorage.setItem("auzef_session_answers_v7", JSON.stringify(sessionAnswers));
+  } catch (e) {}
+}
+
+function saveLifetimeStats() {
+  try {
+    localStorage.setItem("auzef_lifetime_stats_v7", JSON.stringify(lifetimeStats));
+  } catch (e) {}
+}
+
+function recordToLifetimeStats(q, chosenKey) {
+  if (!lifetimeStats.wrongQuestionIds) lifetimeStats.wrongQuestionIds = {};
+  const prevChoice = sessionAnswers[q.id];
+
+  if (!prevChoice) {
+    lifetimeStats.totalSolved = (lifetimeStats.totalSolved || 0) + 1;
+    if (chosenKey === q.cevap) {
+      lifetimeStats.totalCorrect = (lifetimeStats.totalCorrect || 0) + 1;
+    } else {
+      lifetimeStats.totalWrong = (lifetimeStats.totalWrong || 0) + 1;
+      lifetimeStats.wrongQuestionIds[q.id] = true;
+    }
+  } else if (prevChoice !== chosenKey) {
+    if (prevChoice === q.cevap && chosenKey !== q.cevap) {
+      lifetimeStats.totalCorrect = Math.max(0, (lifetimeStats.totalCorrect || 1) - 1);
+      lifetimeStats.totalWrong = (lifetimeStats.totalWrong || 0) + 1;
+      lifetimeStats.wrongQuestionIds[q.id] = true;
+    } else if (prevChoice !== q.cevap && chosenKey === q.cevap) {
+      lifetimeStats.totalWrong = Math.max(0, (lifetimeStats.totalWrong || 1) - 1);
+      lifetimeStats.totalCorrect = (lifetimeStats.totalCorrect || 0) + 1;
+      delete lifetimeStats.wrongQuestionIds[q.id];
+    }
+  }
+  saveLifetimeStats();
+}
+
+function openJsonModal() {
+  const modal = document.getElementById("jsonModal");
+  document.getElementById("editableJsonOutput").value = JSON.stringify(courses, null, 2);
+  document.getElementById("copyStatus").innerText = "";
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeJsonModal() {
+  document.getElementById("jsonModal").classList.add("hidden");
+  document.getElementById("jsonModal").classList.remove("flex");
+}
+
+function copyJsonToClipboard() {
+  const text = document.getElementById("editableJsonOutput").value;
+  navigator.clipboard.writeText(text).then(() => {
+    document.getElementById("copyStatus").innerText = "✓ Kopyalandı!";
+  });
+}
+
+function downloadJsonFile() {
+  const text = document.getElementById("editableJsonOutput").value;
+  const blob = new Blob([text], { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "auzef_soru_bankasi_guncel.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function saveJsonChanges() {
+  const raw = document.getElementById("editableJsonOutput").value.trim();
+  try {
+    const parsed = JSON.parse(raw);
+    if (typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("Geçerli bir ders objesi formatında olmalıdır.");
+    }
+    courses = parsed;
+    localStorage.setItem("auzef_custom_courses_v7", JSON.stringify(courses));
+    alert("✓ Değişiklikler başarıyla kaydedildi!");
+    closeJsonModal();
+    renderCourseTabs();
+    const firstKey = courses[activeCourseKey] ? activeCourseKey : Object.keys(courses)[0];
+    selectCourse(firstKey);
+  } catch (err) {
+    alert("JSON Format Hatası: " + err.message);
+  }
+}
+
+function deleteActiveCourse() {
+  const courseName = courses[activeCourseKey]?.ders_adi || activeCourseKey;
+  if (!confirm(`"${courseName}" dersini silmek istediğinize emin misiniz?`)) return;
+
+  delete courses[activeCourseKey];
+  localStorage.setItem("auzef_custom_courses_v7", JSON.stringify(courses));
+
+  const remainingKeys = Object.keys(courses);
+  if (remainingKeys.length > 0) {
+    selectCourse(remainingKeys[0]);
+  } else {
+    courses = { ...defaultCourses };
+    selectCourse("gayrimuslim");
+  }
+  closeJsonModal();
+  alert("Ders silindi.");
+}
+
+function renderCourseTabs() {
+  const container = document.getElementById("courseTabs");
+  container.innerHTML = "";
+  let totalQuestionsCount = 0;
+
+  Object.keys(courses).forEach(key => {
+    const c = courses[key];
+    if (!c || !Array.isArray(c.sorular)) return;
+    totalQuestionsCount += c.sorular.length;
+    const isActive = key === activeCourseKey;
+    const btn = document.createElement("button");
+    btn.className = `px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition flex items-center gap-2 ${
+      isActive ? "bg-amber-500 text-slate-950 shadow-md" : "bg-slate-700/70 text-slate-200 hover:bg-slate-700"
+    }`;
+    btn.innerHTML = `<span>${c.kisa_ad || c.ders_adi}</span> <span class="px-1.5 py-0.5 rounded-full text-[10px] ${
+      isActive ? "bg-slate-900 text-amber-400" : "bg-slate-800 text-slate-300"
+    }">${c.sorular.length}</span>`;
+    btn.onclick = () => selectCourse(key);
+    container.appendChild(btn);
+  });
+
+  document.getElementById("headerSubText").innerText = `${Object.keys(courses).length} Ders • ${totalQuestionsCount} Soru Havuzu`;
+}
+
+function selectCourse(courseKey) {
+  if (isExamMode) {
+    if (!confirm("Aktif bir sınav modundasınız. Dersi değiştirirseniz sınav sonlandırılır. Devam edilsin mi?")) return;
+    isExamMode = false;
+    if (examTimerInterval) clearInterval(examTimerInterval);
+    document.getElementById("reminderTimerBadge")?.classList.add("hidden");
+  }
+  activeCourseKey = courseKey;
+  renderCourseTabs();
+  populateSectionFilter();
+  applyFilters();
+}
+
+function selectWeakCourse() {
+  let allWrongs = [];
+  const wrongIds = lifetimeStats.wrongQuestionIds || {};
+
+  Object.keys(courses).forEach(key => {
+    if (key === "weak_pool") return;
+    const c = courses[key];
+    if (!c || !Array.isArray(c.sorular)) return;
+    const wrongs = c.sorular.filter(q => wrongIds[q.id] || (sessionAnswers[q.id] && sessionAnswers[q.id] !== q.cevap));
+    allWrongs = allWrongs.concat(wrongs);
+  });
+
+  if (allWrongs.length === 0) {
+    alert("Henüz yanlış yaptığınız veya zayıf olarak kaydedilen bir soru bulunmuyor!");
+    return;
+  }
+
+  allWrongs.forEach(q => { delete sessionAnswers[q.id]; });
+  saveSessionState();
+
+  courses["weak_pool"] = {
+    ders_kodu: "weak_pool",
+    ders_adi: "Zayıf Olduğum / Yanlış Yaptığım Sorular",
+    kisa_ad: "📌 Zayıf Sorularım",
+    sorular: allWrongs
+  };
+
+  selectCourse("weak_pool");
+}
+
+function populateSectionFilter() {
+  const course = courses[activeCourseKey];
+  const select = document.getElementById("sectionFilter");
+  if (!course || !Array.isArray(course.sorular)) return;
+
+  const sections = [...new Set(course.sorular.map(q => q.bolum || "Genel"))];
+
+  select.innerHTML = `<option value="ALL">Tüm Kategoriler / Üniteler (${course.sorular.length} Soru)</option>`;
+  sections.forEach(sec => {
+    const count = course.sorular.filter(q => (q.bolum || "Genel") === sec).length;
+    select.innerHTML += `<option value="${sec}">${sec} (${count} Soru)</option>`;
+  });
+}
+
+function applyFilters() {
+  const course = courses[activeCourseKey];
+  if (!course || !Array.isArray(course.sorular)) return;
+  const secVal = document.getElementById("sectionFilter").value;
+  const query = document.getElementById("searchInput").value.trim().toLowerCase();
+
+  let list = [...course.sorular];
+  if (secVal && secVal !== "ALL") {
+    list = list.filter(q => (q.bolum || "Genel") === secVal);
+  }
+
+  if (query) {
+    list = list.filter(q =>
+      q.soru.toLowerCase().includes(query) ||
+      Object.values(q.siklar).some(opt => String(opt).toLowerCase().includes(query))
+    );
+  }
+
+  activePool = list;
+  currentIndex = 0;
+  renderAll();
+}
+
+// SEÇİLEN SORU SAYISINA GÖRE TEST BAŞLATMA
+function startRandomExam() {
+  const course = courses[activeCourseKey];
+  if (!course || !course.sorular.length) return;
+  isExamMode = false;
+  if (examTimerInterval) clearInterval(examTimerInterval);
+
+  const countVal = document.getElementById("examQuestionCountSelect")?.value || "20";
+  const shuffled = [...course.sorular].sort(() => Math.random() - 0.5);
+
+  if (countVal === "ALL") {
+    activePool = shuffled;
+  } else {
+    const limit = parseInt(countVal, 10);
+    activePool = shuffled.slice(0, Math.min(limit, shuffled.length));
+  }
+
+  activePool.forEach(q => { delete sessionAnswers[q.id]; });
+  saveSessionState();
+  currentIndex = 0;
+  renderAll();
+}
+
+function filterWrongOnly() {
+  const course = courses[activeCourseKey];
+  if (!course) return;
+  const wrongIds = lifetimeStats.wrongQuestionIds || {};
+  const wrongs = course.sorular.filter(q => (sessionAnswers[q.id] && sessionAnswers[q.id] !== q.cevap) || wrongIds[q.id]);
+  if (wrongs.length === 0) {
+    alert("Bu derste yanlış yaptığınız soru bulunamadı.");
+    return;
+  }
+
+  wrongs.forEach(q => { delete sessionAnswers[q.id]; });
+  saveSessionState();
+
+  activePool = wrongs;
+  currentIndex = 0;
+  renderAll();
+}
+
+function shuffleActiveQuestions() {
+  activePool = [...activePool].sort(() => Math.random() - 0.5);
+  currentIndex = 0;
+  renderAll();
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  const singleBtn = document.getElementById("modeSingleBtn");
+  const listBtn = document.getElementById("modeListBtn");
+  const singleContainer = document.getElementById("singleViewContainer");
+  const listContainer = document.getElementById("listViewContainer");
+
+  if (mode === "single") {
+    singleBtn.className = "py-1.5 text-xs font-bold rounded-md bg-white shadow-sm text-blue-900";
+    listBtn.className = "py-1.5 text-xs font-bold rounded-md text-slate-600";
+    singleContainer.classList.remove("hidden");
+    listContainer.classList.add("hidden");
+  } else {
+    listBtn.className = "py-1.5 text-xs font-bold rounded-md bg-white shadow-sm text-blue-900";
+    singleBtn.className = "py-1.5 text-xs font-bold rounded-md text-slate-600";
+    singleContainer.classList.add("hidden");
+    listContainer.classList.remove("hidden");
+  }
+  renderAll();
+}
+
+function selectAnswer(qId, chosenKey) {
+  const q = activePool.find(item => item.id === qId);
+  if (q) {
+    recordToLifetimeStats(q, chosenKey);
+  }
+  sessionAnswers[qId] = chosenKey;
+  saveSessionState();
+  updateStreakOnAnswer();
+  renderAll();
+}
+
+function clearSingleQuestionAnswer() {
+  if (activePool.length === 0) return;
+  const q = activePool[currentIndex];
+  delete sessionAnswers[q.id];
+  saveSessionState();
+  renderAll();
+}
+
+function navigateQuestion(step) {
+  const target = currentIndex + step;
+  if (target >= 0 && target < activePool.length) {
+    currentIndex = target;
+    renderAll();
+  }
+}
+
+function jumpToQuestion(idx) {
+  currentIndex = idx;
+  if (viewMode === "list") {
+    const el = document.getElementById(`list_q_${idx}`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  } else {
+    renderAll();
+  }
+}
+
+function resetProgress() {
+  if (activePool.length === 0) return;
+  activePool.forEach(q => {
+    delete sessionAnswers[q.id];
+  });
+  saveSessionState();
+  currentIndex = 0;
+  renderAll();
+}
+
+function renderSingleQuestion() {
+  const qText = document.getElementById("qText");
+  const qOptions = document.getElementById("qOptions");
+  const qFeedback = document.getElementById("qFeedback");
+  const qIndexBadge = document.getElementById("qIndexBadge");
+  const qSectionBadge = document.getElementById("qSectionBadge");
+  const examIndicator = document.getElementById("examModeIndicator");
+  const clearBtn = document.getElementById("clearSingleAnsBtn");
+  const qOriginalNo = document.getElementById("qOriginalNo");
+  const footerCounter = document.getElementById("footerCounter");
+
+  if (isExamMode) examIndicator.classList.remove("hidden");
+  else examIndicator.classList.add("hidden");
+
+  if (activePool.length === 0) {
+    qIndexBadge.innerText = "Soru Yok";
+    qSectionBadge.innerText = "-";
+    qText.innerText = "Arama kriterlerinize uygun soru bulunamadı veya henüz JSON yüklenmedi.";
+    qOptions.innerHTML = "";
+    qFeedback.classList.add("hidden");
+    clearBtn.classList.add("hidden");
+    footerCounter.innerText = "0 / 0";
+    return;
+  }
+
+  if (currentIndex >= activePool.length) currentIndex = 0;
+  const q = activePool[currentIndex];
+  const answered = sessionAnswers[q.id];
+
+  if (answered) clearBtn.classList.remove("hidden");
+  else clearBtn.classList.add("hidden");
+
+  qIndexBadge.innerText = `Soru ${currentIndex + 1} / ${activePool.length}`;
+  qSectionBadge.innerText = q.bolum || "Genel";
+  qOriginalNo.innerText = `#${q.no || currentIndex + 1}`;
+  footerCounter.innerText = `${currentIndex + 1} / ${activePool.length}`;
+
+  qText.innerText = q.soru;
+  qOptions.innerHTML = "";
+
+  for (const [key, val] of Object.entries(q.siklar)) {
+    const btn = document.createElement("button");
+    btn.className = "option-btn w-full text-left p-3.5 rounded-xl border-2 border-slate-200 bg-white flex items-start gap-3 text-xs sm:text-sm text-slate-800";
+
+    let badgeClass = "bg-slate-100 text-slate-700";
+
+    if (isExamMode) {
+      if (answered === key) {
+        btn.classList.add("border-blue-600", "bg-blue-50/70");
+        badgeClass = "bg-blue-600 text-white";
+      }
+      btn.onclick = () => selectAnswer(q.id, key);
+    } else {
+      if (answered) {
+        if (key === q.cevap) {
+          btn.classList.add("option-correct");
+          badgeClass = "bg-emerald-600 text-white";
+        } else if (key === answered && answered !== q.cevap) {
+          btn.classList.add("option-wrong");
+          badgeClass = "bg-rose-600 text-white";
+        }
+      }
+      btn.onclick = () => selectAnswer(q.id, key);
+    }
+
+    btn.innerHTML = `<span class="w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center shrink-0 ${badgeClass}">${key}</span><span class="pt-0.5 leading-snug">${val}</span>`;
+    qOptions.appendChild(btn);
+  }
+
+  if (!isExamMode && answered) {
+    const isCorrect = answered === q.cevap;
+    qFeedback.className = `mt-5 p-4 rounded-xl border text-xs sm:text-sm leading-relaxed ${
+      isCorrect ? "bg-emerald-50 border-emerald-200 text-emerald-900" : "bg-rose-50 border-rose-200 text-rose-900"
+    }`;
+    qFeedback.innerHTML = isCorrect
+      ? `<strong>✓ Doğru!</strong> Doğru seçenek: <strong>${q.cevap}) ${q.siklar[q.cevap]}</strong>`
+      : `<strong>✗ Yanlış.</strong> Doğru seçenek: <strong>${q.cevap}) ${q.siklar[q.cevap]}</strong>`;
+    qFeedback.classList.remove("hidden");
+  } else {
+    qFeedback.classList.add("hidden");
+  }
+
+  document.getElementById("prevBtn").disabled = currentIndex === 0;
+  document.getElementById("nextBtn").disabled = currentIndex === activePool.length - 1;
+}
+
+function renderListQuestions() {
+  const container = document.getElementById("listViewContainer");
+  container.innerHTML = "";
+
+  if (activePool.length === 0) {
+    container.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center text-slate-500 text-sm border">Soru bulunamadı.</div>`;
+    return;
+  }
+
+  activePool.forEach((q, idx) => {
+    const answered = sessionAnswers[q.id];
+    const card = document.createElement("div");
+    card.id = `list_q_${idx}`;
+    card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 p-5";
+
+    let optionsHtml = "";
+    for (const [key, val] of Object.entries(q.siklar)) {
+      let extraClass = "border-slate-200 bg-white";
+      let badgeClass = "bg-slate-100 text-slate-700";
+
+      if (isExamMode) {
+        if (answered === key) {
+          extraClass = "border-blue-600 bg-blue-50/70";
+          badgeClass = "bg-blue-600 text-white";
+        }
+      } else {
+        if (answered) {
+          if (key === q.cevap) {
+            extraClass = "option-correct";
+            badgeClass = "bg-emerald-600 text-white";
+          } else if (key === answered && answered !== q.cevap) {
+            extraClass = "option-wrong";
+            badgeClass = "bg-rose-600 text-white";
+          }
+        }
+      }
+
+      optionsHtml += `
+        <button onclick="selectAnswer('${q.id}', '${key}')" class="option-btn w-full text-left p-3 rounded-xl border-2 ${extraClass} flex items-start gap-3 text-xs sm:text-sm">
+          <span class="w-6 h-6 rounded-full font-bold text-xs flex items-center justify-center shrink-0 ${badgeClass}">${key}</span>
+          <span class="pt-0.5">${val}</span>
+        </button>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-full bg-blue-900 text-white font-bold text-xs">Soru ${idx + 1}</span>
+          <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold text-xs">${q.bolum || "Genel"}</span>
+        </div>
+        <span class="text-[11px] text-slate-400">#${q.no || idx + 1}</span>
+      </div>
+      <p class="font-semibold text-slate-800 text-sm sm:text-base mb-4 leading-relaxed">${q.soru}</p>
+      <div class="space-y-2">${optionsHtml}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderPaletteAndStats() {
+  const grid = document.getElementById("questionGrid");
+  grid.innerHTML = "";
+
+  let correct = 0;
+  let wrong = 0;
+
+  activePool.forEach((q, idx) => {
+    const ans = sessionAnswers[q.id];
+    let colorClass = "bg-slate-100 text-slate-700 hover:bg-slate-200";
+
+    if (ans) {
+      if (isExamMode) {
+        colorClass = "bg-blue-600 text-white font-bold";
+      } else if (ans === q.cevap) {
+        correct++;
+        colorClass = "bg-emerald-500 text-white font-bold";
+      } else {
+        wrong++;
+        colorClass = "bg-rose-500 text-white font-bold";
+      }
+    }
+
+    if (idx === currentIndex && viewMode === "single") {
+      colorClass += " ring-2 ring-blue-900 ring-offset-1";
+    }
+
+    const btn = document.createElement("button");
+    btn.className = `h-8 rounded-lg text-xs font-semibold transition flex items-center justify-center ${colorClass}`;
+    btn.innerText = idx + 1;
+    btn.onclick = () => jumpToQuestion(idx);
+    grid.appendChild(btn);
+  });
+
+  const total = activePool.length;
+  const answeredCount = activePool.filter(q => sessionAnswers[q.id]).length;
+  const empty = total - answeredCount;
+
+  let netCorrect = correct - (wrong / 3);
+  if (netCorrect < 0) netCorrect = 0;
+
+  let score = 0;
+  if (total > 0) {
+    score = Math.round((netCorrect / total) * 100);
+    if (score < 0) score = 0;
+  }
+
+  document.getElementById("statTotal").innerText = total;
+  document.getElementById("statCorrect").innerText = isExamMode ? "?" : correct;
+  document.getElementById("statWrong").innerText = isExamMode ? "?" : wrong;
+  document.getElementById("statEmpty").innerText = empty;
+  document.getElementById("statPercent").innerText = isExamMode ? "? Net" : `${netCorrect.toFixed(2)} Net`;
+  document.getElementById("statScore").innerText = isExamMode ? "?" : score;
+  document.getElementById("progressBar").style.width = total > 0 ? `${(answeredCount / total) * 100}%` : "0%";
+
+  const wrongBtn = document.getElementById("wrongFilterBtn");
+  const course = courses[activeCourseKey];
+  const wrongIds = lifetimeStats.wrongQuestionIds || {};
+  const totalCourseWrongs = course ? course.sorular.filter(q => (sessionAnswers[q.id] && sessionAnswers[q.id] !== q.cevap) || wrongIds[q.id]).length : 0;
+  if (totalCourseWrongs > 0 && !isExamMode) {
+    wrongBtn.classList.remove("hidden");
+    document.getElementById("wrongCountBadge").innerText = totalCourseWrongs;
+  } else {
+    wrongBtn.classList.add("hidden");
+  }
+}
+
+function renderAll() {
+  if (is10QuestionQuizMode) return;
+  if (viewMode === "single") renderSingleQuestion();
+  else renderListQuestions();
+  renderPaletteAndStats();
+}
+
+function openAddCourseModal() {
+  document.getElementById("importStatus").innerText = "";
+  document.getElementById("addCourseModal").classList.remove("hidden");
+  document.getElementById("addCourseModal").classList.add("flex");
+}
+
+function closeAddCourseModal() {
+  document.getElementById("addCourseModal").classList.add("hidden");
+  document.getElementById("addCourseModal").classList.remove("flex");
+}
+
+function handleJsonFileSelect(event) {
+  const files = event.target.files;
+  const statusEl = document.getElementById("importStatus");
+  if (!files || files.length === 0) return;
+
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById("importJsonInput").value = e.target.result;
+      statusEl.className = "font-bold text-xs text-emerald-600";
+      statusEl.innerText = `✓ "${file.name}" okundu! Birleştiriliyor...`;
+      importCustomCourse();
+    };
+    reader.readAsText(file, "UTF-8");
+  });
+}
+
+async function fetchJsonFromUrl() {
+  let url = document.getElementById("jsonUrlInput").value.trim();
+  const statusEl = document.getElementById("importStatus");
+  if (!url) {
+    statusEl.className = "font-bold text-xs text-rose-600";
+    statusEl.innerText = "Lütfen geçerli bir link girin.";
+    return;
+  }
+
+  if (url.includes("drive.google.com") && url.includes("id=")) {
+    const fileIdMatch = url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (fileIdMatch && fileIdMatch[1]) {
+      url = `https://docs.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+    }
+  }
+
+  statusEl.className = "font-bold text-xs text-blue-600";
+  statusEl.innerText = "⏳ Veriler çekiliyor...";
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Sunucu yanıt vermedi");
+    const text = await res.text();
+    document.getElementById("importJsonInput").value = text;
+    importCustomCourse();
+  } catch (err) {
+    statusEl.className = "font-bold text-xs text-rose-600";
+    statusEl.innerText = "Bağlantı hatası veya CORS engeli. Dosya Seç ile yükleyin.";
+  }
+}
+
+function normalizeCourseName(str) {
+  return (str || "").toLowerCase().replace(/[^a-z0-9ğüşıöç]/g, "");
+}
+
+// 20yygarmusltarvize1.json Veya Diğer Tüm Düz Soru Dizilerini SİLMEDEN BİRLEŞTİREN AKILLI İTHALAT MİMARİSİ
+function importCustomCourse() {
+  const raw = document.getElementById("importJsonInput").value.trim();
+  const statusEl = document.getElementById("importStatus");
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+
+    // Durum A: Doğrudan düz soru dizisi (Array) formatındaysa
+    if (Array.isArray(parsed)) {
+      if (parsed.length === 0) throw new Error("JSON dizisi boş.");
+      
+      const sampleDersAdi = parsed[0].ders_adi || "AUZEF Soru Paketi";
+      let targetKey = "ders_" + normalizeCourseName(sampleDersAdi).slice(0, 15);
+
+      for (const existingKey of Object.keys(courses)) {
+        const c = courses[existingKey];
+        if (normalizeCourseName(c.ders_adi) === normalizeCourseName(sampleDersAdi)) {
+          targetKey = existingKey;
+          break;
+        }
+      }
+
+      const formattedQuestions = parsed.map((q, idx) => {
+        let siklar = q.siklar;
+        if (!siklar && q.secenek_a) {
+          siklar = {
+            A: q.secenek_a,
+            B: q.secenek_b,
+            C: q.secenek_c,
+            D: q.secenek_d,
+            E: q.secenek_e || ""
+          };
+        }
+        let bolumAdi = q.bolum;
+        if (!bolumAdi && q.unite_no) {
+          bolumAdi = `${q.unite_no}. Ünite`;
+        }
+
+        return {
+          id: q.id ? `${targetKey}_${q.id}` : `${targetKey}_${Date.now()}_${idx + 1}`,
+          no: q.id || idx + 1,
+          bolum: bolumAdi || "Vize Soruları",
+          soru: q.soru || q.soru_metni,
+          siklar: siklar,
+          cevap: q.cevap || q.dogru_cevap || "A"
+        };
+      });
+
+      // Eski sorular SİLİNMEZ! Soru metnine göre map ile birleştirilir.
+      const existingQuestions = courses[targetKey]?.sorular || [];
+      const mergedMap = new Map();
+      existingQuestions.forEach(q => mergedMap.set(q.soru.trim(), q));
+      formattedQuestions.forEach(q => mergedMap.set(q.soru.trim(), q));
+
+      const finalQuestions = Array.from(mergedMap.values());
+
+      courses[targetKey] = {
+        ders_kodu: targetKey,
+        ders_adi: sampleDersAdi,
+        kisa_ad: sampleDersAdi.slice(0, 22),
+        sorular: finalQuestions
+      };
+
+      localStorage.setItem("auzef_custom_courses_v7", JSON.stringify(courses));
+      statusEl.className = "font-bold text-xs text-emerald-600";
+      statusEl.innerText = `✓ "${sampleDersAdi}" dersine ${formattedQuestions.length} soru eklendi! Toplam: ${finalQuestions.length} soru.`;
+
+      setTimeout(() => {
+        closeAddCourseModal();
+        selectCourse(targetKey);
+      }, 600);
+      return;
+    }
+
+    // Durum B: Standart Obje Formatı
+    if (!parsed.ders_adi && typeof parsed === "object") {
+      let importedCount = 0;
+      Object.keys(parsed).forEach(k => {
+        const item = parsed[k];
+        if (item && item.ders_adi && Array.isArray(item.sorular)) {
+          let targetKey = item.ders_kodu || k;
+          for (const existingKey of Object.keys(courses)) {
+            if (normalizeCourseName(courses[existingKey].ders_adi) === normalizeCourseName(item.ders_adi)) {
+              targetKey = existingKey;
+              break;
+            }
+          }
+          const formatted = item.sorular.map((q, idx) => ({
+            id: q.id || `${targetKey}_${Date.now()}_${idx + 1}`,
+            no: q.no || q.id || idx + 1,
+            bolum: q.bolum || "Genel",
+            soru: q.soru,
+            siklar: q.siklar,
+            cevap: q.cevap || q.dogru_cevap || "A"
+          }));
+
+          const oldQ = courses[targetKey]?.sorular || [];
+          const mapQ = new Map();
+          oldQ.forEach(q => mapQ.set(q.soru.trim(), q));
+          formatted.forEach(q => mapQ.set(q.soru.trim(), q));
+
+          courses[targetKey] = {
+            ders_kodu: targetKey,
+            ders_adi: item.ders_adi,
+            kisa_ad: item.kisa_ad || item.ders_adi.slice(0, 22),
+            sorular: Array.from(mapQ.values())
+          };
+          importedCount++;
+        }
+      });
+
+      if (importedCount > 0) {
+        localStorage.setItem("auzef_custom_courses_v7", JSON.stringify(courses));
+        statusEl.className = "font-bold text-xs text-emerald-600";
+        statusEl.innerText = `✓ ${importedCount} ders başarıyla havuza eklendi ve birleştirildi!`;
+        setTimeout(() => {
+          closeAddCourseModal();
+          selectCourse(Object.keys(courses)[0]);
+        }, 500);
+        return;
+      }
+    }
+
+    if (!parsed.ders_adi || !Array.isArray(parsed.sorular)) {
+      throw new Error("JSON formatı tanınamadı. 'ders_adi' ve 'sorular' alanı bulunmalı.");
+    }
+
+    let targetKey = parsed.ders_kodu || "ders_" + Date.now();
+    const incomingNormName = normalizeCourseName(parsed.ders_adi);
+
+    for (const existingKey of Object.keys(courses)) {
+      const c = courses[existingKey];
+      if (!c) continue;
+      if (
+        normalizeCourseName(c.ders_adi) === incomingNormName ||
+        normalizeCourseName(c.kisa_ad) === incomingNormName ||
+        normalizeCourseName(existingKey) === normalizeCourseName(parsed.ders_kodu)
+      ) {
+        targetKey = existingKey;
+        break;
+      }
+    }
+
+    const formattedQuestions = parsed.sorular.map((q, idx) => ({
+      id: q.id || `${targetKey}_${Date.now()}_${idx + 1}`,
+      no: q.no || q.id || idx + 1,
+      bolum: q.bolum || "Genel",
+      soru: q.soru,
+      siklar: q.siklar,
+      cevap: q.cevap || q.dogru_cevap || "A"
+    }));
+
+    const existingQuestions = courses[targetKey]?.sorular || [];
+    const mergedMap = new Map();
+    existingQuestions.forEach(q => mergedMap.set(q.soru.trim(), q));
+    formattedQuestions.forEach(q => mergedMap.set(q.soru.trim(), q));
+
+    const finalQuestions = Array.from(mergedMap.values());
+
+    courses[targetKey] = {
+      ders_kodu: targetKey,
+      ders_adi: parsed.ders_adi,
+      kisa_ad: parsed.kisa_ad || courses[targetKey]?.kisa_ad || parsed.ders_adi.slice(0, 22),
+      sorular: finalQuestions
+    };
+
+    localStorage.setItem("auzef_custom_courses_v7", JSON.stringify(courses));
+
+    statusEl.className = "font-bold text-xs text-emerald-600";
+    statusEl.innerText = `✓ "${parsed.ders_adi}" dersine ${formattedQuestions.length} soru eklendi! Toplam: ${finalQuestions.length} soru.`;
+
+    setTimeout(() => {
+      closeAddCourseModal();
+      selectCourse(targetKey);
+    }, 600);
+  } catch (err) {
+    statusEl.className = "font-bold text-xs text-rose-600";
+    statusEl.innerText = "JSON Hatalı: " + err.message;
+  }
+}
+
+// Günlük Seri (Streak) Yönetimi
+function getStreakData() {
+  try {
+    const data = JSON.parse(localStorage.getItem("auzef_streak_data") || "{}");
+    const today = new Date().toISOString().slice(0, 10);
+    if (!data.lastDate) return { count: 0, lastDate: null };
+    const last = new Date(data.lastDate);
+    const now = new Date(today);
+    const diffTime = Math.abs(now - last);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays > 1) return { count: 0, lastDate: null };
+    return data;
+  } catch (e) {
+    return { count: 0, lastDate: null };
+  }
+}
+
+function updateStreakOnAnswer() {
+  const today = new Date().toISOString().slice(0, 10);
+  let data = getStreakData();
+  if (data.lastDate !== today) {
+    data.count = (data.count || 0) + 1;
+    data.lastDate = today;
+    localStorage.setItem("auzef_streak_data", JSON.stringify(data));
+  }
+  const display = document.getElementById("streakCountDisplay");
+  if (display) display.innerText = `${data.count} Gün`;
+}
+
+function updateNotifPermissionButton() {
+  const btn = document.getElementById("notifPermBtn");
+  if (!("Notification" in window) || !btn) return;
+  if (Notification.permission === "granted") {
+    btn.innerText = "✓ İzin Verildi";
+    btn.className = "px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-[11px]";
+  }
+}
+
+function requestSystemNotificationPermission() {
+  if (!("Notification" in window)) return;
+  Notification.requestPermission().then(() => updateNotifPermissionButton());
+}
+
+function toggleCustomAudioUpload() {
+  const val = document.getElementById("customSoundSelect").value;
+  const fileInput = document.getElementById("customAudioFileInput");
+  if (val === "custom_file") fileInput.classList.remove("hidden");
+  else fileInput.classList.add("hidden");
+}
+
+function handleCustomAudioUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    customUploadedAudioData = e.target.result;
+    const audio = new Audio(customUploadedAudioData);
+    audio.play().catch(() => {});
+  };
+  reader.readAsDataURL(file);
+}
+
+function playNotificationEffects() {
+  const soundType = document.getElementById("customSoundSelect")?.value || "bell";
+  if (soundType === "custom_file" && customUploadedAudioData) {
+    const audio = new Audio(customUploadedAudioData);
+    audio.play().catch(() => {});
+  } else if (soundType !== "none") {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      if (soundType === "bell") {
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+        osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
+      } else if (soundType === "chime") {
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.2);
+      } else {
+        osc.type = "square";
+        osc.frequency.setValueAtTime(900, ctx.currentTime);
+        osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.1);
+      }
+
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {}
+  }
+}
+
+function startReminderTimer() {
+  reminderIntervalSec = parseInt(document.getElementById("reminderIntervalSelect").value, 10);
+  remainingSec = reminderIntervalSec;
+  if (reminderTimerId) clearInterval(reminderTimerId);
+
+  document.getElementById("reminderTimerBadge").classList.remove("hidden");
+  document.getElementById("stopReminderBtn").classList.remove("hidden");
+  updateTimerBadgeText();
+  closeReminderModal();
+
+  reminderTimerId = setInterval(() => {
+    const targetTimeStr = document.getElementById("targetDailyTimeInput")?.value;
+    if (targetTimeStr) {
+      const now = new Date();
+      const currentHm = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+      if (currentHm === targetTimeStr && !window._dailyNotifiedToday) {
+        window._dailyNotifiedToday = true;
+        trigger10QuestionQuizModal();
+        return;
+      }
+    }
+
+    if (!document.getElementById("popupQuestionModal").classList.contains("hidden")) return;
+    remainingSec--;
+    updateTimerBadgeText();
+    if (remainingSec <= 0) {
+      trigger10QuestionQuizModal();
+      remainingSec = reminderIntervalSec;
+    }
+  }, 1000);
+}
+
+function stopReminderTimer() {
+  if (reminderTimerId) clearInterval(reminderTimerId);
+  reminderTimerId = null;
+  document.getElementById("reminderTimerBadge").classList.add("hidden");
+  document.getElementById("stopReminderBtn").classList.add("hidden");
+  closeReminderModal();
+}
+
+function updateTimerBadgeText() {
+  const mins = String(Math.floor(remainingSec / 60)).padStart(2, "0");
+  const secs = String(remainingSec % 60).padStart(2, "0");
+  document.getElementById("reminderTimerBadge").innerText = `${mins}:${secs}`;
+}
+
+function trigger10QuestionQuizModal() {
+  closeReminderModal();
+  let candidatePool = [];
+
+  Object.keys(courses).forEach(key => {
+    if (key === "weak_pool") return;
+    const c = courses[key];
+    if (!c || !Array.isArray(c.sorular)) return;
+    c.sorular.forEach(q => {
+      candidatePool.push({ ...q, ders_adi: c.ders_adi });
+    });
+  });
+
+  if (candidatePool.length === 0) {
+    alert("Soru havuzunda soru bulunamadı!");
+    return;
+  }
+
+  quizQuestionsList = candidatePool.sort(() => Math.random() - 0.5).slice(0, Math.min(10, candidatePool.length));
+  quizCurrentIdx = 0;
+  quizCorrectCount = 0;
+  quizWrongCount = 0;
+  is10QuestionQuizMode = true;
+
+  playNotificationEffects();
+
+  if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
+    const n = new Notification(`🎯 Sınav Koçu - 10 Soruluk Deneme Vakti!`, { body: "Senin için 10 soru hazırladım, çözmek ister misin?" });
+    n.onclick = () => { window.focus(); n.close(); };
+  }
+
+  document.getElementById("finish10QuizEarlyBtn")?.classList.remove("hidden");
+  renderQuizModalQuestion();
+  document.getElementById("popupQuestionModal").classList.remove("hidden");
+  document.getElementById("popupQuestionModal").classList.add("flex");
+}
+
+function renderQuizModalQuestion() {
+  const q = quizQuestionsList[quizCurrentIdx];
+  document.getElementById("popupModalHeaderTitle").innerText = `🎯 10 Soruluk Deneme (${quizCurrentIdx + 1}/${quizQuestionsList.length})`;
+  document.getElementById("popupCourseTitle").innerText = q.ders_adi;
+  document.getElementById("popupSectionBadge").innerText = q.bolum || "Genel";
+  document.getElementById("popupQuestionText").innerText = q.soru;
+
+  const optsContainer = document.getElementById("popupOptionsList");
+  optsContainer.innerHTML = "";
+  document.getElementById("popupFeedbackBox").classList.add("hidden");
+  document.getElementById("popupNextBtn").classList.add("hidden");
+
+  for (const [key, val] of Object.entries(q.siklar)) {
+    const btn = document.createElement("button");
+    btn.id = `popup_opt_${key}`;
+    btn.className = "option-btn w-full text-left p-2.5 rounded-xl border-2 border-slate-200 bg-white flex items-start gap-2 text-xs sm:text-sm text-slate-800";
+    btn.innerHTML = `<span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">${key}</span><span class="pt-0.5">${val}</span>`;
+    btn.onclick = () => answerQuizModalQuestion(key);
+    optsContainer.appendChild(btn);
+  }
+}
+
+function answerQuizModalQuestion(selectedKey) {
+  const q = quizQuestionsList[quizCurrentIdx];
+  if (!q) return;
+
+  const isCorrect = selectedKey === q.cevap;
+  if (isCorrect) quizCorrectCount++;
+  else quizWrongCount++;
+
+  recordToLifetimeStats(q, selectedKey);
+  updateStreakOnAnswer();
+
+  for (const key of Object.keys(q.siklar)) {
+    const btn = document.getElementById(`popup_opt_${key}`);
+    if (!btn) continue;
+    btn.disabled = true;
+    if (key === q.cevap) btn.classList.add("option-correct");
+    else if (key === selectedKey && !isCorrect) btn.classList.add("option-wrong");
+  }
+
+  const feedbackBox = document.getElementById("popupFeedbackBox");
+  feedbackBox.className = `mt-3 p-2.5 rounded-xl text-xs font-semibold ${isCorrect ? "bg-emerald-50 text-emerald-900 border border-emerald-200" : "bg-rose-50 text-rose-900 border border-rose-200"}`;
+  feedbackBox.innerHTML = isCorrect ? `✓ Doğru!` : `✗ Yanlış. Doğru seçenek: ${q.cevap}) ${q.siklar[q.cevap]}`;
+  feedbackBox.classList.remove("hidden");
+
+  if (quizCurrentIdx < quizQuestionsList.length - 1) {
+    document.getElementById("popupNextBtn").classList.remove("hidden");
+  } else {
+    setTimeout(() => { showQuizCompletionReport(); }, 1000);
+  }
+}
+
+function nextPopupQuestion() {
+  quizCurrentIdx++;
+  renderQuizModalQuestion();
+}
+
+function showQuizCompletionReport() {
+  is10QuestionQuizMode = false;
+  const totalQ = quizQuestionsList.length || 10;
+  const emptyCount = Math.max(0, totalQ - (quizCorrectCount + quizWrongCount));
+  let net = quizCorrectCount - (quizWrongCount / 3);
+  if (net < 0) net = 0;
+  let score = Math.round((net / totalQ) * 100);
+
+  if (!lifetimeStats.examHistory) lifetimeStats.examHistory = [];
+  lifetimeStats.examHistory.unshift({
+    date: new Date().toLocaleString("tr-TR"),
+    title: "10 Soruluk Koçluk Denemesi",
+    total: totalQ,
+    correct: quizCorrectCount,
+    wrong: quizWrongCount,
+    empty: emptyCount,
+    score: score
+  });
+  saveLifetimeStats();
+
+  const optsContainer = document.getElementById("popupOptionsList");
+  document.getElementById("popupModalHeaderTitle").innerText = "🏆 10 Soruluk Deneme Sonucu";
+  document.getElementById("popupCourseTitle").innerText = "Koçluk Değerlendirmesi";
+  document.getElementById("popupSectionBadge").innerText = "Tamamlandı";
+  document.getElementById("finish10QuizEarlyBtn")?.classList.add("hidden");
+  document.getElementById("popupQuestionText").innerHTML = `
+    <div class="space-y-3 py-2 text-xs">
+      <div class="grid grid-cols-4 gap-2 text-center">
+        <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl"><div class="text-emerald-700 font-bold">Doğru</div><div class="text-base font-extrabold text-emerald-900">${quizCorrectCount}</div></div>
+        <div class="p-2.5 bg-rose-50 border border-rose-200 rounded-xl"><div class="text-rose-700 font-bold">Yanlış</div><div class="text-base font-extrabold text-rose-900">${quizWrongCount}</div></div>
+        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl"><div class="text-slate-600 font-bold">Boş</div><div class="text-base font-extrabold text-slate-800">${emptyCount}</div></div>
+        <div class="p-2.5 bg-blue-50 border border-blue-200 rounded-xl"><div class="text-blue-700 font-bold">Puan</div><div class="text-base font-extrabold text-blue-900">${score}</div></div>
+      </div>
+      <p class="font-semibold text-slate-700 text-center">Sonuçların kalıcı istatistiklerine eklendi!</p>
+    </div>
+  `;
+  optsContainer.innerHTML = "";
+  document.getElementById("popupFeedbackBox").classList.add("hidden");
+  document.getElementById("popupNextBtn").classList.add("hidden");
+}
+
+function snoozeReminder() {
+  closePopupQuestion();
+  remainingSec = 300; 
+  document.getElementById("reminderTimerBadge").classList.remove("hidden");
+  document.getElementById("stopReminderBtn").classList.remove("hidden");
+}
+
+function openReminderModal() {
+  updateNotifPermissionButton();
+  const streak = getStreakData();
+  const display = document.getElementById("streakCountDisplay");
+  if (display) display.innerText = `${streak.count || 0} Gün`;
+  document.getElementById("reminderSettingsModal").classList.remove("hidden");
+  document.getElementById("reminderSettingsModal").classList.add("flex");
+}
+
+function closeReminderModal() {
+  document.getElementById("reminderSettingsModal").classList.add("hidden");
+  document.getElementById("reminderSettingsModal").classList.remove("flex");
+}
+
+function closePopupQuestion() {
+  is10QuestionQuizMode = false;
+  document.getElementById("popupQuestionModal").classList.add("hidden");
+  document.getElementById("popupQuestionModal").classList.remove("flex");
+  remainingSec = reminderIntervalSec;
+  renderAll();
+}
+
+function startExamSimulation() {
+  const course = courses[activeCourseKey];
+  if (!course || !Array.isArray(course.sorular) || course.sorular.length === 0) {
+    alert("Bu derste çözülecek soru bulunamadı.");
+    return;
+  }
+
+  const shuffled = [...course.sorular].sort(() => Math.random() - 0.5);
+  activePool = shuffled.slice(0, Math.min(20, shuffled.length));
+  
+  activePool.forEach(q => { delete sessionAnswers[q.id]; });
+  saveSessionState();
+
+  isExamMode = true;
+  currentIndex = 0;
+  examSecondsLeft = activePool.length * 90; 
+
+  startExamTimer();
+  renderAll();
+}
+
+function startExamTimer() {
+  if (examTimerInterval) clearInterval(examTimerInterval);
+  const timerBadge = document.getElementById("reminderTimerBadge");
+  if (timerBadge) timerBadge.classList.remove("hidden");
+
+  examTimerInterval = setInterval(() => {
+    examSecondsLeft--;
+    const mins = String(Math.floor(examSecondsLeft / 60)).padStart(2, "0");
+    const secs = String(examSecondsLeft % 60).padStart(2, "0");
+    if (timerBadge) timerBadge.innerText = `⏱️ ${mins}:${secs}`;
+
+    if (examSecondsLeft <= 0) {
+      clearInterval(examTimerInterval);
+      alert("Süre doldu! Sınavınız tamamlandı.");
+      finishCurrentTestAnytime();
+    }
+  }, 1000);
+}
+
+function finishCurrentTestAnytime() {
+  if (activePool.length === 0) return;
+
+  if (examTimerInterval) clearInterval(examTimerInterval);
+  document.getElementById("reminderTimerBadge")?.classList.add("hidden");
+
+  let correct = 0, wrong = 0, empty = 0;
+  activePool.forEach(q => {
+    const ans = sessionAnswers[q.id];
+    if (!ans) empty++;
+    else if (ans === q.cevap) correct++;
+    else wrong++;
+  });
+
+  let net = correct - (wrong / 3);
+  if (net < 0) net = 0;
+  let score = activePool.length > 0 ? Math.round((net / activePool.length) * 100) : 0;
+  if (score < 0) score = 0;
+
+  const wasExamMode = isExamMode;
+  isExamMode = false;
+
+  const courseName = courses[activeCourseKey]?.kisa_ad || "Genel Test";
+  if (!lifetimeStats.examHistory) lifetimeStats.examHistory = [];
+  lifetimeStats.examHistory.unshift({
+    date: new Date().toLocaleString("tr-TR"),
+    title: `${courseName} (${wasExamMode ? 'Sınav Modu' : 'Test'})`,
+    total: activePool.length,
+    correct: correct,
+    wrong: wrong,
+    empty: empty,
+    score: score
+  });
+  saveLifetimeStats();
+
+  const content = document.getElementById("examResultContent");
+  content.innerHTML = `
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+      <div class="p-3 rounded-xl bg-slate-50 border"><div class="text-slate-500 text-xs">Toplam Soru</div><div class="text-lg font-extrabold text-slate-900">${activePool.length}</div></div>
+      <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200"><div class="text-emerald-700 text-xs">Doğru</div><div class="text-lg font-extrabold text-emerald-800">${correct}</div></div>
+      <div class="p-3 rounded-xl bg-rose-50 border border-rose-200"><div class="text-rose-700 text-xs">Yanlış</div><div class="text-lg font-extrabold text-rose-800">${wrong}</div></div>
+      <div class="p-3 rounded-xl bg-amber-50 border border-amber-200"><div class="text-amber-700 text-xs">Boş</div><div class="text-lg font-extrabold text-amber-800">${empty}</div></div>
+    </div>
+    <div class="p-4 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between mt-3">
+      <div>
+        <div class="font-bold text-blue-950">Net Başarı / Puan</div>
+        <div class="text-xs text-blue-700">Bu sonuç kalıcı istatistiklerinize kaydedildi.</div>
+      </div>
+      <div class="text-right">
+        <div class="text-sm font-extrabold text-blue-900">${net.toFixed(2)} Net</div>
+        <div class="text-base font-extrabold text-amber-600">${score} / 100 Puan</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("examResultModal").classList.remove("hidden");
+  document.getElementById("examResultModal").classList.add("flex");
+  renderAll();
+}
+
+function closeExamResultModal() {
+  document.getElementById("examResultModal").classList.add("hidden");
+  document.getElementById("examResultModal").classList.remove("flex");
+  renderAll();
+}
+
+function closeExamResultModalAndClear() {
+  closeExamResultModal();
+  resetProgress();
+}
+
+function openStatsModal() {
+  const modal = document.getElementById("statsModal");
+  const content = document.getElementById("statsContent");
+  
+  let totalAllQuestions = 0;
+  Object.keys(courses).forEach(key => {
+    if (key === "weak_pool") return;
+    if (courses[key] && Array.isArray(courses[key].sorular)) {
+      totalAllQuestions += courses[key].sorular.length;
+    }
+  });
+
+  const solved = lifetimeStats.totalSolved || 0;
+  const correct = lifetimeStats.totalCorrect || 0;
+  const wrong = lifetimeStats.totalWrong || 0;
+  const success = solved > 0 ? Math.round((correct / solved) * 100) : 0;
+
+  let historyHtml = "";
+  if (lifetimeStats.examHistory && lifetimeStats.examHistory.length > 0) {
+    historyHtml = `<div class="mt-3 pt-3 border-t"><div class="font-bold text-slate-700 mb-2">Son Bitirilen Test & Sınav Geçmişi:</div><div class="space-y-2">`;
+    lifetimeStats.examHistory.slice(0, 10).forEach(item => {
+      historyHtml += `
+        <div class="p-2.5 rounded-lg bg-slate-50 border flex items-center justify-between text-[11px]">
+          <div>
+            <div class="font-bold text-slate-800">${item.title}</div>
+            <div class="text-slate-400">${item.date}</div>
+          </div>
+          <div class="text-right">
+            <span class="text-emerald-700 font-bold">${item.correct}D</span> / 
+            <span class="text-rose-700 font-bold">${item.wrong}Y</span> / 
+            <span class="text-slate-500">${item.empty}B</span>
+            <div class="font-extrabold text-blue-900">${item.score} Puan</div>
+          </div>
+        </div>
+      `;
+    });
+    historyHtml += `</div></div>`;
+  }
+
+  content.innerHTML = `
+    <div class="grid grid-cols-2 gap-3">
+      <div class="p-3 rounded-xl bg-slate-50 border"><div class="text-slate-500">Bankadaki Toplam Soru</div><div class="text-lg font-extrabold">${totalAllQuestions}</div></div>
+      <div class="p-3 rounded-xl bg-blue-50 border border-blue-200"><div class="text-blue-700">Toplam Çözülen (Kalıcı)</div><div class="text-lg font-extrabold text-blue-900">${solved}</div></div>
+      <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200"><div class="text-emerald-700">Toplam Doğru</div><div class="text-lg font-extrabold text-emerald-800">${correct}</div></div>
+      <div class="p-3 rounded-xl bg-amber-50 border border-amber-200"><div class="text-amber-700">Genel Başarı Oranı</div><div class="text-lg font-extrabold text-amber-700">${success}%</div></div>
+    </div>
+    ${historyHtml}
+  `;
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function hardResetLifetimeStats() {
+  if (!confirm("Kalıcı istatistiklerinizi ve sınav geçmişinizi tamamen sıfırlamak istediğinize emin misiniz?")) return;
+  lifetimeStats = { totalSolved: 0, totalCorrect: 0, totalWrong: 0, wrongQuestionIds: {}, examHistory: [] };
+  saveLifetimeStats();
+  openStatsModal();
+}
+
+function closeStatsModal() {
+  document.getElementById("statsModal").classList.add("hidden");
+  document.getElementById("statsModal").classList.remove("flex");
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadSavedState();
+  renderCourseTabs();
+  const initialKey = courses[activeCourseKey] ? activeCourseKey : Object.keys(courses)[0];
+  selectCourse(initialKey || "gayrimuslim");
+});
+
+let deferredPrompt = null;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById("installAppBtn")?.classList.remove("hidden");
+});
+
+function installPWAApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+  } else {
+    alert("Tarayıcınızın menüsünden 'Ana Ekrana Ekle' seçeneğini kullanabilirsiniz.");
+  }
+}
+</script>
+</body>
+</html>
