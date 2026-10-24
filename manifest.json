@@ -24,6 +24,22 @@
   "prefer_related_applications": false,
   "related_applications": [],
   "iarc_rating_id": "IARC-Z100",
+  "shortcuts": [
+    {
+      "name": "Süreli Sınav Modu",
+      "short_name": "Sınav",
+      "description": "Hemen süreli sınav simülasyonunu başlat",
+      "url": "./index.html?mode=exam",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Kalıcı İstatistikler",
+      "short_name": "İstatistik",
+      "description": "Çalışma geçmişini ve netlerini görüntüle",
+      "url": "./index.html?mode=stats",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    }
+  ],
   "icons": [
     {
       "src": "./icon-192.png",
