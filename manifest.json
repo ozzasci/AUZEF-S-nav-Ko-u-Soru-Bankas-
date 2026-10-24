@@ -8,6 +8,14 @@
   "orientation": "portrait",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
+  "categories": [
+    "education",
+    "books",
+    "productivity"
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "iarc_rating_id": "IARC-Z100",
   "icons": [
     {
       "src": "./icon-192.png",
