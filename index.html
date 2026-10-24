@@ -109,6 +109,9 @@
           <button onclick="startBlitzMode()" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-orange-600 text-white hover:bg-orange-500 shadow-sm flex items-center gap-1.5" title="Süreye Karşı Hızlı Yarış Modu">
   <span>⚡ Blitz Modu</span>
 </button>
+          <button onclick="startMatchingGameModal()" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-teal-700 text-white hover:bg-teal-600 shadow-sm flex items-center gap-1.5" title="Kavram Eşleştirme Bulmaca Modu">
+  <span>🧩 Bulmaca</span>
+</button>
         </div>
       </div>
     </div>
@@ -635,6 +638,54 @@ function saveJsonChanges() {
   } catch (err) {
     alert("JSON Format Hatası: " + err.message);
   }
+}
+  let matchingGameData = [];
+
+function startMatchingGameModal() {
+  const course = courses[activeCourseKey];
+  if (!course || !Array.isArray(course.sorular) || course.sorular.length < 4) {
+    alert("Bu mod için derste en az 4 soru bulunmalıdır.");
+    return;
+  }
+
+  // Soru havuzundan rastgele 4-5 soru seçip kavram ve soru metnini eşleştirme havuzu yapalım
+  const shuffled = [...course.sorular].sort(() => Math.random() - 0.5).slice(0, 5);
+  
+  matchingGameData = shuffled.map((q, idx) => ({
+    id: idx,
+    term: `Soru #${q.no || idx+1} Kavramı`,
+    definition: q.soru.length > 80 ? q.soru.slice(0, 77) + "..." : q.soru,
+    originalQ: q
+  }));
+
+  // Eşleştirme modalını açıp bulmacayı ekrana çizeceğiz
+  openMatchingModalHtml();
+}
+
+function openMatchingModalHtml() {
+  // Modal arayüzünü dinamik oluşturabilir veya HTML'e önceden ekleyebiliriz.
+  let html = `<div class="space-y-3 text-xs">
+    <p class="font-bold text-slate-700">Aşağıdaki soruları anahtar kelimeleriyle eşleştirin:</p>`;
+  
+  matchingGameData.forEach((item, idx) => {
+    html += `<div class="p-3 bg-slate-50 border rounded-xl flex justify-between items-center gap-2">
+      <span class="font-bold text-blue-900">${item.term}</span>
+      <span class="text-slate-600">${item.definition}</span>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // Mevcut popup modalını bu amaçla kullanabilir veya yeni bir modal açabiliriz.
+  document.getElementById("popupModalHeaderTitle").innerText = "🧩 Kavram Eşleştirme Bulmacası";
+  document.getElementById("popupCourseTitle").innerText = courses[activeCourseKey].ders_adi;
+  document.getElementById("popupSectionBadge").innerText = "Mini Oyun";
+  document.getElementById("popupQuestionText").innerHTML = html;
+  document.getElementById("popupOptionsList").innerHTML = `<div class="text-center font-bold text-emerald-700 py-2">Eşleştirme testi yakında tam interaktif sürümle aktif!</div>`;
+  document.getElementById("popupFeedbackBox").classList.add("hidden");
+  document.getElementById("popupNextBtn").classList.add("hidden");
+  
+  document.getElementById("popupQuestionModal").classList.remove("hidden");
+  document.getElementById("popupQuestionModal").classList.add("flex");
 }
 
 function deleteActiveCourse() {
