@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+f<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
@@ -1380,9 +1380,26 @@ function normalizeCourseName(str) {
 }
 
 function importCustomCourse() {
-  const raw = document.getElementById("importJsonInput").value.trim();
+  const inputEl = document.getElementById("importJsonInput");
   const statusEl = document.getElementById("importStatus");
-  if (!raw) return;
+  
+  if (!inputEl) {
+    if (statusEl) {
+      statusEl.className = "font-bold text-xs text-rose-600";
+      statusEl.innerText = "Hata: 'importJsonInput' alanı bulunamadı.";
+    }
+    return;
+  }
+
+  const raw = (inputEl.value || "").trim();
+  if (!raw) {
+    if (statusEl) {
+      statusEl.className = "font-bold text-xs text-rose-600";
+      statusEl.innerText = "Lütfen içeriğe bir JSON metni yapıştırın veya dosya seçin.";
+    }
+    return;
+  }
+
   try {
     const parsed = JSON.parse(raw);
 
@@ -1420,16 +1437,20 @@ function importCustomCourse() {
           id: q.id ? `${targetKey}_${q.id}` : `${targetKey}_${Date.now()}_${idx + 1}`,
           no: q.id || idx + 1,
           bolum: bolumAdi || "Vize Soruları",
-          soru: q.soru || q.soru_metni,
-          siklar: siklar,
+          soru: q.soru || q.soru_metni || "Soru metni belirtilmemiş",
+          siklar: siklar || { A: "A", B: "B" },
           cevap: q.cevap || q.dogru_cevap || "A"
         };
       });
 
       const existingQuestions = courses[targetKey]?.sorular || [];
       const mergedMap = new Map();
-      existingQuestions.forEach(q => mergedMap.set(q.soru.trim(), q));
-      formattedQuestions.forEach(q => mergedMap.set(q.soru.trim(), q));
+      existingQuestions.forEach(q => {
+        if (q && q.soru) mergedMap.set(String(q.soru).trim(), q);
+      });
+      formattedQuestions.forEach(q => {
+        if (q && q.soru) mergedMap.set(String(q.soru).trim(), q);
+      });
 
       const finalQuestions = Array.from(mergedMap.values());
 
@@ -1441,8 +1462,10 @@ function importCustomCourse() {
       };
 
       localStorage.setItem("auzef_custom_courses_v7", JSON.stringify(courses));
-      statusEl.className = "font-bold text-xs text-emerald-600";
-      statusEl.innerText = `✓ "${sampleDersAdi}" dersine ${formattedQuestions.length} soru eklendi! Toplam: ${finalQuestions.length} soru.`;
+      if (statusEl) {
+        statusEl.className = "font-bold text-xs text-emerald-600";
+        statusEl.innerText = `✓ "${sampleDersAdi}" dersine ${formattedQuestions.length} soru eklendi! Toplam: ${finalQuestions.length} soru.`;
+      }
 
       setTimeout(() => {
         closeAddCourseModal();
@@ -1467,15 +1490,15 @@ function importCustomCourse() {
             id: q.id || `${targetKey}_${Date.now()}_${idx + 1}`,
             no: q.no || q.id || idx + 1,
             bolum: q.bolum || "Genel",
-            soru: q.soru,
-            siklar: q.siklar,
+            soru: q.soru || "Soru metni yok",
+            siklar: q.siklar || { A: "A" },
             cevap: q.cevap || q.dogru_cevap || "A"
           }));
 
           const oldQ = courses[targetKey]?.sorular || [];
           const mapQ = new Map();
-          oldQ.forEach(q => mapQ.set(q.soru.trim(), q));
-          formatted.forEach(q => mapQ.set(q.soru.trim(), q));
+          oldQ.forEach(q => { if (q && q.soru) mapQ.set(String(q.soru).trim(), q); });
+          formatted.forEach(q => { if (q && q.soru) mapQ.set(String(q.soru).trim(), q); });
 
           courses[targetKey] = {
             ders_kodu: targetKey,
@@ -1489,8 +1512,10 @@ function importCustomCourse() {
 
       if (importedCount > 0) {
         localStorage.setItem("auzef_custom_courses_v7", JSON.stringify(courses));
-        statusEl.className = "font-bold text-xs text-emerald-600";
-        statusEl.innerText = `✓ ${importedCount} ders başarıyla havuza eklendi ve birleştirildi!`;
+        if (statusEl) {
+          statusEl.className = "font-bold text-xs text-emerald-600";
+          statusEl.innerText = `✓ ${importedCount} ders başarıyla havuza eklendi ve birleştirildi!`;
+        }
         setTimeout(() => {
           closeAddCourseModal();
           selectCourse(Object.keys(courses)[0]);
@@ -1523,15 +1548,15 @@ function importCustomCourse() {
       id: q.id || `${targetKey}_${Date.now()}_${idx + 1}`,
       no: q.no || q.id || idx + 1,
       bolum: q.bolum || "Genel",
-      soru: q.soru,
-      siklar: q.siklar,
+      soru: q.soru || "Soru metni yok",
+      siklar: q.siklar || { A: "A" },
       cevap: q.cevap || q.dogru_cevap || "A"
     }));
 
     const existingQuestions = courses[targetKey]?.sorular || [];
     const mergedMap = new Map();
-    existingQuestions.forEach(q => mergedMap.set(q.soru.trim(), q));
-    formattedQuestions.forEach(q => mergedMap.set(q.soru.trim(), q));
+    existingQuestions.forEach(q => { if (q && q.soru) mergedMap.set(String(q.soru).trim(), q); });
+    formattedQuestions.forEach(q => { if (q && q.soru) mergedMap.set(String(q.soru).trim(), q); });
 
     const finalQuestions = Array.from(mergedMap.values());
 
@@ -1544,19 +1569,22 @@ function importCustomCourse() {
 
     localStorage.setItem("auzef_custom_courses_v7", JSON.stringify(courses));
 
-    statusEl.className = "font-bold text-xs text-emerald-600";
-    statusEl.innerText = `✓ "${parsed.ders_adi}" dersine ${formattedQuestions.length} soru eklendi! Toplam: ${finalQuestions.length} soru.`;
+    if (statusEl) {
+      statusEl.className = "font-bold text-xs text-emerald-600";
+      statusEl.innerText = `✓ "${parsed.ders_adi}" dersine ${formattedQuestions.length} soru eklendi! Toplam: ${finalQuestions.length} soru.`;
+    }
 
     setTimeout(() => {
       closeAddCourseModal();
       selectCourse(targetKey);
     }, 600);
   } catch (err) {
-    statusEl.className = "font-bold text-xs text-rose-600";
-    statusEl.innerText = "JSON Hatalı: " + err.message;
+    if (statusEl) {
+      statusEl.className = "font-bold text-xs text-rose-600";
+      statusEl.innerText = "JSON Hatalı: " + err.message;
+    }
   }
 }
-
 function getStreakData() {
   try {
     const data = JSON.parse(localStorage.getItem("auzef_streak_data") || "{}");
